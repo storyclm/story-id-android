@@ -3,10 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-def localProperties = 'local.properties'
+def apiProperties = 'api.properties'
 def properties = new Properties()
-if (project.rootProject.file(localProperties).exists()) {
-    properties.load(project.rootProject.file(localProperties).newDataInputStream())
+if (project.rootProject.file(apiProperties).exists()) {
+    properties.load(project.rootProject.file(apiProperties).newDataInputStream())
 }
 
 android {
