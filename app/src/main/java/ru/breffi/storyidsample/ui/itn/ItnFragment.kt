@@ -17,8 +17,10 @@ import kotlinx.android.synthetic.main.static_hint_edittext.view.*
 import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.common.glide.GlideApp
+import ru.breffi.storyidsample.ui.common.model.ChangeState
 import ru.breffi.storyidsample.utils.ImageFragment
 import ru.breffi.storyidsample.utils.applyMask
+import ru.breffi.storyidsample.utils.setButtonEnabled
 import java.io.File
 import javax.inject.Inject
 
@@ -29,7 +31,8 @@ class ItnFragment : ImageFragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private val viewModel: ItnViewModel by viewModels { viewModelFactory }
 
-    var profile: ProfileModel? = null
+    private var profile: ProfileModel? = null
+    private val changeState = ChangeState()
 
     companion object {
 
@@ -42,10 +45,12 @@ class ItnFragment : ImageFragment() {
     }
 
     override fun onSelectImage(file: File) {
+        changeState.itemChanged(ITN_TMP_FILE, true)
         viewModel.setItnImage(file)
     }
 
     override fun onDeleteImage(fileName: String) {
+        changeState.itemChanged(ITN_TMP_FILE, true)
         viewModel.deleteImage()
     }
 
@@ -67,6 +72,8 @@ class ItnFragment : ImageFragment() {
         tvItn.text.applyMask("____________")
         tvItn.text.inputType = InputType.TYPE_CLASS_PHONE
 
+        changeState.setChangeListener { buttonSave.setButtonEnabled(it) }
+
         addItn.setOnClickListener {
             selectImage(ITN_TMP_FILE)
         }
@@ -77,15 +84,13 @@ class ItnFragment : ImageFragment() {
                 it.copy(itn = itnModel)
             }
 
-            tvItn.wasChanged = false
-
             viewModel.saveProfile(profile)
-            setButtonEnabled(false)
+            changeState.reset()
+            buttonSave.setButtonEnabled(false)
 
             activity?.setResult(Activity.RESULT_OK)
         }
-
-        setButtonEnabled(true)
+        buttonSave.setButtonEnabled(false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -144,17 +149,8 @@ class ItnFragment : ImageFragment() {
         }
 
         tvItn.text.addTextChangedListener {
-            setButtonEnabled(true)
+            changeState.itemChanged("number", it.toString() != itn.itn)
         }
-    }
-
-    private fun setButtonEnabled(enabled: Boolean) {
-        if (enabled) {
-            buttonSave.alpha = 1f
-        } else {
-            buttonSave.alpha = 0.4f
-        }
-        buttonSave.isEnabled = enabled
     }
 }
 

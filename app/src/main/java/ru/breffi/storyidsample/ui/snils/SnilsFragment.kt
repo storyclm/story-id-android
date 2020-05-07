@@ -11,14 +11,19 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import kotlinx.android.synthetic.main.fragment_itn.*
 import kotlinx.android.synthetic.main.fragment_snils.*
+import kotlinx.android.synthetic.main.fragment_snils.buttonSave
 import kotlinx.android.synthetic.main.layout_doc_image.view.*
 import kotlinx.android.synthetic.main.static_hint_edittext.view.*
 import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.common.glide.GlideApp
+import ru.breffi.storyidsample.ui.common.model.ChangeState
+import ru.breffi.storyidsample.ui.itn.ItnFragment
 import ru.breffi.storyidsample.utils.ImageFragment
 import ru.breffi.storyidsample.utils.applyMask
+import ru.breffi.storyidsample.utils.setButtonEnabled
 import java.io.File
 import javax.inject.Inject
 
@@ -29,7 +34,8 @@ class SnilsFragment : ImageFragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private val viewModel: SnilsViewModel by viewModels { viewModelFactory }
 
-    var profile: ProfileModel? = null
+    private var profile: ProfileModel? = null
+    private val changeState = ChangeState()
 
     companion object {
 
@@ -42,10 +48,12 @@ class SnilsFragment : ImageFragment() {
     }
 
     override fun onSelectImage(file: File) {
+        changeState.itemChanged(SNILS_TMP_FILE, true)
         viewModel.setSnilsImage(file)
     }
 
     override fun onDeleteImage(fileName: String) {
+        changeState.itemChanged(SNILS_TMP_FILE, true)
         viewModel.deleteImage()
     }
 
@@ -67,6 +75,8 @@ class SnilsFragment : ImageFragment() {
         tvSnils.text.applyMask("___-___-___-__")
         tvSnils.text.inputType = InputType.TYPE_CLASS_PHONE
 
+        changeState.setChangeListener { buttonSave.setButtonEnabled(it) }
+
         addSnils.setOnClickListener {
             selectImage(SNILS_TMP_FILE)
         }
@@ -77,15 +87,14 @@ class SnilsFragment : ImageFragment() {
                 it.copy(snils = snilsModel)
             }
 
-            tvSnils.wasChanged = false
-
             viewModel.saveProfile(profile)
-            setButtonEnabled(false)
+            changeState.reset()
+            buttonSave.setButtonEnabled(false)
 
             activity?.setResult(Activity.RESULT_OK)
         }
 
-        setButtonEnabled(true)
+        buttonSave.setButtonEnabled(false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -144,17 +153,8 @@ class SnilsFragment : ImageFragment() {
         }
 
         tvSnils.text.addTextChangedListener {
-            setButtonEnabled(true)
+            changeState.itemChanged("number", it.toString() != snils.snils)
         }
-    }
-
-    private fun setButtonEnabled(enabled: Boolean) {
-        if (enabled) {
-            buttonSave.alpha = 1f
-        } else {
-            buttonSave.alpha = 0.4f
-        }
-        buttonSave.isEnabled = enabled
     }
 }
 

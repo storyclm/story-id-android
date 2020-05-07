@@ -24,10 +24,13 @@ import kotlinx.android.synthetic.main.static_hint_edittext.view.*
 import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.common.glide.GlideApp
+import ru.breffi.storyidsample.ui.common.model.ChangeState
 import ru.breffi.storyidsample.ui.image_preview.ImagePreviewActivity
+import ru.breffi.storyidsample.ui.itn.ItnFragment
 import ru.breffi.storyidsample.ui.passport.model.PassportPage
 import ru.breffi.storyidsample.utils.ImageFragment
 import ru.breffi.storyidsample.utils.applyMask
+import ru.breffi.storyidsample.utils.setButtonEnabled
 import java.io.File
 import javax.inject.Inject
 
@@ -38,9 +41,12 @@ class PassportFragment : ImageFragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private val viewModel: PassportViewModel by viewModels { viewModelFactory }
 
-    var profile: ProfileModel? = null
+    private var profile: ProfileModel? = null
+    private val changeState = ChangeState()
 
     companion object {
+
+        const val IMAGE_CHANGE_TAG = "image"
 
         fun newInstance(): PassportFragment {
             return PassportFragment()
@@ -49,10 +55,12 @@ class PassportFragment : ImageFragment() {
     }
 
     override fun onSelectImage(file: File) {
+        changeState.itemChanged(IMAGE_CHANGE_TAG, true)
         viewModel.setImage(file)
     }
 
     override fun onDeleteImage(fileName: String) {
+        changeState.itemChanged(IMAGE_CHANGE_TAG, true)
         viewModel.deleteImage(fileName)
     }
 
@@ -74,6 +82,8 @@ class PassportFragment : ImageFragment() {
         tvPassport.text.applyMask("____ ______")
         tvPassport.text.inputType = InputType.TYPE_CLASS_PHONE
 
+        changeState.setChangeListener { buttonSave.setButtonEnabled(it) }
+
         addPassport.setOnClickListener {
             selectImage(viewModel.getPassportFileName())
         }
@@ -87,12 +97,13 @@ class PassportFragment : ImageFragment() {
             }
 
             viewModel.saveProfile(profile)
-            setButtonEnabled(false)
+            changeState.reset()
+            buttonSave.setButtonEnabled(false)
 
             activity?.setResult(Activity.RESULT_OK)
         }
 
-        setButtonEnabled(true)
+        buttonSave.setButtonEnabled(false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -202,15 +213,10 @@ class PassportFragment : ImageFragment() {
         tvPassport.setText(passportNumber)
 
         viewModel.setPassportImages(passport.pages)
-    }
 
-    private fun setButtonEnabled(enabled: Boolean) {
-        if (enabled) {
-            buttonSave.alpha = 1f
-        } else {
-            buttonSave.alpha = 0.4f
+        tvPassport.text.addTextChangedListener {
+            changeState.itemChanged("number", it.toString() != passport.sn)
         }
-        buttonSave.isEnabled = enabled
     }
 }
 
