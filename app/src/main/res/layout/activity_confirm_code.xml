@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true"
+    tools:context=".ui.confirm_code.ConfirmCodeActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <include layout="@layout/include_app_bar" />
+
+            <View
+                android:id="@+id/appBarShadow"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:background="@drawable/top_shadow"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias=".4">
+
+            <ru.breffi.storyidsample.ui.widget.vercode.VerificationCodeEditText
+                android:id="@+id/verificationCode"
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                android:layout_marginStart="@dimen/base_72"
+                android:layout_marginTop="@dimen/base_32"
+                android:layout_marginEnd="@dimen/base_72"
+                android:inputType="number"
+                android:longClickable="false"
+                android:textAppearance="@style/RobotoBold.36"
+                android:textColor="@color/black_new"
+                app:bottomLineHeight="@dimen/base_2"
+                app:bottomLineNormalColor="@color/red"
+                app:bottomLineSelectedColor="@color/red"
+                app:selectedBackgroundColor="@color/background"
+                app:verBackgroundColor="@color/background"
+                app:verCodeMargin="@dimen/base_16"
+                tools:text="2456" />
+
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/base_42"
+                android:visibility="invisible"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:gravity="center"
+            android:layout_marginStart="@dimen/base_16"
+            android:layout_marginEnd="@dimen/base_16">
+
+            <Button
+                android:id="@+id/nextButton"
+                style="@style/Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/red"
+                android:minHeight="58dp"
+                android:paddingStart="@dimen/base_40"
+                android:paddingEnd="@dimen/base_40"
+                android:text="@string/text_sms_repeat"
+                android:textColor="@color/white"
+                />
+
+            <TextView
+                android:id="@+id/resendCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/base_32"
+                android:layout_marginTop="@dimen/base_16"
+                android:layout_marginEnd="@dimen/base_32"
+                android:gravity="center"
+                android:padding="@dimen/base_18"
+                android:text="@string/text_sms_repeat"
+                android:textAppearance="@style/SFProTextSemibold.11" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

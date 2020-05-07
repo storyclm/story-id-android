@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/digitView"
+    android:layout_width="@dimen/base_56"
+    android:layout_height="60dp"
+    android:background="?android:attr/selectableItemBackgroundBorderless"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center"
+    android:orientation="vertical"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/pinBar"
+    >
+
+    <TextView
+        android:id="@+id/digit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:textAppearance="@style/RobotoLight.32"
+        android:textColor="#37474F"
+        tools:text="2"
+        />
+
+    <TextView
+        android:id="@+id/chars"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:textAppearance="@style/RobotoRegular.12"
+        android:textColor="#8A000000"
+        tools:text="WXYZ"
+        />
+
+</LinearLayout>

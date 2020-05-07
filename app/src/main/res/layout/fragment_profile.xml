@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/photoLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#F5F5F5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_load_photo"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView"
+                app:layout_constraintEnd_toEndOf="@+id/imageView"
+                app:layout_constraintStart_toStartOf="@+id/imageView"
+                app:layout_constraintTop_toTopOf="@+id/imageView"
+                />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="0dp"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <ImageView
+                android:id="@+id/addAvatar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/base_16"
+                android:layout_marginEnd="@dimen/base_16"
+                android:src="@drawable/ic_add_photo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cardTools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/base_12"
+            android:layout_marginBottom="80dp"
+            android:background="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/photoLayout"
+            >
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/base_16"
+                android:layout_marginTop="@dimen/base_16"
+                android:text="@string/label_data"
+                android:textAppearance="@style/RobotoMedium.14"
+                android:textColor="@color/grey"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/profile"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="wrap_content"
+                android:minHeight="55dp"
+                android:layout_marginTop="@dimen/base_16"
+                android:drawableEnd="@drawable/ic_arrow"
+                android:drawablePadding="@dimen/base_36"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/base_20"
+                android:paddingEnd="@dimen/base_20"
+                android:text="@string/button_personal_information"
+                android:textAppearance="@style/RobotoRegular.16"
+                android:textColor="#DE000000"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView3"
+                />
+
+            <View
+                android:id="@+id/divider1"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="@dimen/base_1"
+                android:layout_marginStart="@dimen/base_20"
+                android:background="#1F000000"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profile"
+                />
+
+            <TextView
+                android:id="@+id/itn"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="wrap_content"
+                android:minHeight="55dp"
+                android:drawableEnd="@drawable/ic_arrow"
+                android:drawablePadding="@dimen/base_36"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/base_20"
+                android:paddingEnd="@dimen/base_20"
+                android:text="@string/button_itn"
+                android:textAppearance="@style/RobotoRegular.16"
+                android:textColor="#DE000000"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider1"
+                />
+
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="@dimen/base_1"
+                android:layout_marginStart="@dimen/base_20"
+                android:background="#1F000000"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/itn"
+                />
+
+            <TextView
+                android:id="@+id/snils"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="wrap_content"
+                android:minHeight="55dp"
+                android:drawableEnd="@drawable/ic_arrow"
+                android:drawablePadding="@dimen/base_36"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/base_20"
+                android:paddingEnd="@dimen/base_20"
+                android:text="@string/button_snils"
+                android:textAppearance="@style/RobotoRegular.16"
+                android:textColor="#DE000000"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider2"
+                />
+
+            <View
+                android:id="@+id/divider3"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="@dimen/base_1"
+                android:layout_marginStart="@dimen/base_20"
+                android:background="#1F000000"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/snils"
+                />
+
+            <TextView
+                android:id="@+id/passport"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="wrap_content"
+                android:minHeight="55dp"
+                android:drawableEnd="@drawable/ic_arrow"
+                android:drawablePadding="@dimen/base_36"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/base_20"
+                android:paddingEnd="@dimen/base_20"
+                android:text="@string/button_passport"
+                android:textAppearance="@style/RobotoRegular.16"
+                android:textColor="#DE000000"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider3"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="@dimen/base_0"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_shadow"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardTools"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

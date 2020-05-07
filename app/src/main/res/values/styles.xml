@@ -1,0 +1,203 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:statusBarColor">@color/dark_red</item>
+        <item name="colorControlNormal">@color/white</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="TranslucentActivityTheme" parent="@style/AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+
+    <style name="SplashActivityStyle" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:statusBarColor">@color/dark_red</item>
+        <item name="android:windowBackground">@drawable/splash_bg</item>
+    </style>
+
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColorPrimary">#8A000000</item>
+        <item name="colorAccent">@color/red</item>
+    </style>
+
+    <style name="ImageRatingBar" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/pin_selector</item>
+        <item name="android:minHeight">50dp</item>
+        <item name="android:maxHeight">50dp</item>
+    </style>
+
+    <style name="Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textAppearance">@style/SFProTextSemibold.17</item>
+        <item name="android:stateListAnimator" tools:targetApi="lollipop">@null</item>
+    </style>
+
+    <!-- Fonts -->
+
+    <style name="SFProTextMedium">
+        <item name="android:fontFamily">@font/sfprotextmedium</item>
+    </style>
+
+    <style name="SFProTextMedium.13">
+        <item name="android:textSize">@dimen/font_13</item>
+    </style>
+
+    <style name="SFProTextRegular">
+        <item name="android:fontFamily">@font/sfprotextregular</item>
+    </style>
+
+    <style name="SFProTextRegular.12">
+        <item name="android:textSize">@dimen/font_12</item>
+    </style>
+
+    <style name="SFProTextRegular.15">
+        <item name="android:textSize">@dimen/font_15</item>
+    </style>
+
+    <style name="SFProTextRegular.20">
+        <item name="android:textSize">@dimen/font_20</item>
+    </style>
+
+    <style name="SFProDisplayBold">
+        <item name="android:fontFamily">@font/sfprodisplaybold</item>
+    </style>
+
+    <style name="SFProDisplayBold.20">
+        <item name="android:textSize">@dimen/font_20</item>
+    </style>
+
+    <style name="SFProDisplayBold.24">
+        <item name="android:textSize">@dimen/font_24</item>
+    </style>
+
+    <style name="SFProTextSemibold">
+        <item name="android:fontFamily">@font/sftextsemibold</item>
+    </style>
+
+    <style name="SFProTextSemibold.11">
+        <item name="android:textSize">@dimen/font_11</item>
+    </style>
+
+    <style name="SFProTextSemibold.13">
+        <item name="android:textSize">@dimen/font_13</item>
+    </style>
+
+    <style name="SFProTextSemibold.17">
+        <item name="android:textSize">@dimen/font_17</item>
+    </style>
+
+    <style name="RobotoLight">
+        <item name="android:fontFamily">@font/robotolight</item>
+    </style>
+
+    <style name="RobotoLight.32">
+        <item name="android:textSize">@dimen/font_32</item>
+    </style>
+
+    <style name="RobotoRegular">
+        <item name="android:fontFamily">@font/robotoregular</item>
+    </style>
+
+    <style name="RobotoRegular.11">
+        <item name="android:textSize">@dimen/font_11</item>
+    </style>
+
+    <style name="RobotoRegular.12">
+        <item name="android:textSize">@dimen/font_12</item>
+    </style>
+
+    <style name="RobotoRegular.14">
+        <item name="android:textSize">@dimen/font_14</item>
+    </style>
+
+    <style name="RobotoRegular.13">
+        <item name="android:textSize">@dimen/font_13</item>
+    </style>
+
+    <style name="RobotoRegular.15">
+        <item name="android:textSize">@dimen/font_15</item>
+    </style>
+
+    <style name="RobotoRegular.16">
+        <item name="android:textSize">@dimen/font_16</item>
+    </style>
+
+    <style name="RobotoRegular.18">
+        <item name="android:textSize">@dimen/font_18</item>
+    </style>
+
+    <style name="RobotoRegular.20">
+        <item name="android:textSize">@dimen/font_20</item>
+    </style>
+
+    <style name="RobotoBold">
+        <item name="android:fontFamily">@font/robotobold</item>
+    </style>
+
+    <style name="RobotoBold.11">
+        <item name="android:textSize">@dimen/font_11</item>
+    </style>
+
+    <style name="RobotoBold.13">
+        <item name="android:textSize">@dimen/font_13</item>
+    </style>
+
+    <style name="RobotoBold.17">
+        <item name="android:textSize">@dimen/font_17</item>
+    </style>
+
+    <style name="RobotoBold.20">
+        <item name="android:textSize">@dimen/font_20</item>
+    </style>
+
+    <style name="RobotoBold.34">
+        <item name="android:textSize">@dimen/font_34</item>
+    </style>
+
+    <style name="RobotoBold.36">
+        <item name="android:textSize">@dimen/font_36</item>
+    </style>
+
+    <style name="RobotoMedium">
+        <item name="android:fontFamily">@font/robotomedium</item>
+    </style>
+
+    <style name="RobotoMedium.14">
+        <item name="android:textSize">@dimen/font_14</item>
+    </style>
+
+    <style name="RobotoMedium.20">
+        <item name="android:textSize">@dimen/font_20</item>
+    </style>
+
+    <style name="RobotoMedium.28">
+        <item name="android:textSize">@dimen/font_28</item>
+    </style>
+
+    <style name="RobotoMedium.48">
+        <item name="android:textSize">@dimen/font_48</item>
+    </style>
+
+    <style name="RobotoThin">
+        <item name="android:fontFamily">@font/robotothin</item>
+    </style>
+
+    <style name="RobotoThin.22">
+        <item name="android:textSize">@dimen/font_22</item>
+    </style>
+
+
+</resources>

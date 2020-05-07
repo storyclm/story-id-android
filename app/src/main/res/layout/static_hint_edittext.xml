@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+
+    <TextView
+        android:id="@+id/hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/RobotoRegular.12"
+        android:textColor="#CC3F3D3D"
+        tools:text="Фамилия"
+        />
+
+    <EditText
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_8"
+        android:background="@android:color/transparent"
+        android:gravity="bottom"
+        android:maxLines="1"
+        android:inputType="text"
+        android:textAppearance="@style/RobotoRegular.20"
+        android:textColor="#201F1F"
+        tools:text="Иванов"
+        />
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/base_1"
+        android:layout_marginTop="@dimen/base_2"
+        android:alpha="0.5"
+        android:background="@color/light_red"
+        />
+
+</LinearLayout>

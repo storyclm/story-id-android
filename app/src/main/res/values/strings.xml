@@ -1,0 +1,83 @@
+<resources>
+    <string name="app_name">StoryID</string>
+
+    <string name="label_put_phone">Номер телефона</string>
+    <string name="label_get_code">Получить код</string>
+    <string name="label_auth_agreement">Вводя свой номер телефона, вы регистрируетесь в мобильном приложении и принимаете условия &lt;click>лицензионного соглашения&lt;/click></string>
+    <string name="label_put_code">Код из смс</string>
+    <string name="label_resend_code_disabled">Повторная отправка через: %d сек.</string>
+    <string name="label_resend_code">&lt;click>Повторить смс&lt;/click></string>
+    <string name="label_verify">На указанный номер отправлен код подтверждения</string>
+    <string name="label_wrong_code">Неверный код!</string>
+    <string name="label_forget_code">Забыли код?</string>
+    <string name="label_delete">Удалить</string>
+    <string name="label_skip">Пропустить</string>
+    <string name="label_set_pin">Установить пин-код</string>
+
+    <string name="text_sms_repeat">Повторить смс</string>
+    <string name="text_put_pin">Введите код</string>
+    <string name="text_put_pin_again">Повторите код</string>
+    <string name="text_double_exit_tap">Чтобы выйти нажмите "Назад" еще раз!</string>
+    <string name="text_set_pin">Установите ПИН-код</string>
+
+    <string name="error_io_label">Ошибка</string>
+    <string name="error_io_text">Ошибка</string>
+    <string name="error_service_unavaliable">Сервис временно недоступен, попробуйте позже.</string>
+    <string name="error_timeout">Извините, сервер временно недоступен.Повторите попытку через несколько минут.</string>
+    <string name="error_network">Проверьте соединение с интернетом</string>
+    <string name="error_unknown">Произошла неизвестная ошибка</string>
+    <string name="error_not_available">Извините, сервер временно недоступен. Попробуйте открыть приложение через несколько минут.</string>
+    <string name="error_pin_is_incorrect">Неверный ПИН-код!</string>
+    <string name="error_pins_not_equals">Неверный ПИН-код!</string>
+
+    <string name="button_retry">Повторить</string>
+    <string name="button_ok">Ок</string>
+    <string name="button_understand">Ок</string>
+    <string name="button_yes">Да</string>
+    <string name="button_no">Нет</string>
+    <string name="button_cancel">Отмена</string>
+    <string name="button_next">Далее</string>
+    <string name="button_skip">Пропустить</string>
+
+    <string name="hint_phone">+7 (XXX) XXX-XX-XX</string>
+
+    <string name="error_code_is_expired">Срок действия кода истек. Запросите код повторно</string>
+
+    <string name="label_cancel">Отмена</string>
+
+    <string name="title_profile">Профиль</string>
+    <string name="label_load_photo">Загрузить фото</string>
+    <string name="label_data">Данные</string>
+    <string name="button_passport">Паспорт</string>
+    <string name="button_snils">СНИЛС</string>
+    <string name="button_itn">ИНН</string>
+    <string name="button_personal_information">Персональные данные</string>
+
+    <string name="title_logout">Выход из профиля</string>
+    <string name="text_logout">Вы действительно хотите выйти из профиля?</string>
+
+    <string name="title_personal_data">Персональные данные</string>
+
+    <string name="title_itn">ИНН</string>
+    <string name="hint_itn">Номер ИНН</string>
+    <string name="label_itn_scan">Фото ИНН</string>
+
+    <string name="title_snils">СНИЛС</string>
+    <string name="hint_snils">Номер СНИЛС</string>
+    <string name="label_snils_scan">Фото СНИЛС</string>
+
+    <string name="title_passport">Паспорт</string>
+    <string name="hint_passport">Номер и серия</string>
+    <string name="label_passport_scan">Фото паспорта 1 и 3–4 страницы</string>
+
+    <string name="message_remove_current_image">Удалить выбранное изображение?</string>
+
+    <string name="label_choose_file">Выбрать файл</string>
+
+    <string name="button_save_changes">СОХРАНИТЬ ИЗМЕНЕНИЯ</string>
+
+    <string-array name="items_add_photo">
+        <item>Сделать фото</item>
+        <item>Выбрать из галереи</item>
+    </string-array>
+</resources>
