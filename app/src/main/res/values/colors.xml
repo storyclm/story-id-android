@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/red</color>
+    <color name="colorPrimaryDark">@color/dark_red</color>
+    <color name="colorAccent">@color/dark_red</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="white_af">#AFFFFFFF</color>
+    <color name="offwhite">#FBFBFB</color>
+
+    <color name="black_new">#414141</color>
+
+    <color name="grey">#61000000</color>
+
+    <color name="background">#FBFBFB</color>
+    <color name="red">#DF0B25</color>
+    <color name="light_red">#80DF0B25</color>
+    <color name="black">#000000</color>
+
+    <color name="text_link">@color/red</color>
+    <color name="toolbar_color">@color/red</color>
+    <color name="edit_text_error_color" >@color/red</color>
+
+    <color name="dark_red">#BF0E24</color>
+</resources>

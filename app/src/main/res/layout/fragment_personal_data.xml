@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/fieldsLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <ru.breffi.storyidsample.ui.widget.StaticHintEditText
+                android:id="@+id/surname"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/base_8"
+                android:layout_marginTop="@dimen/base_36"
+                android:layout_marginEnd="@dimen/base_8"
+                app:hint="Фамилия"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <ru.breffi.storyidsample.ui.widget.StaticHintEditText
+                android:id="@+id/name"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/base_8"
+                android:layout_marginTop="@dimen/base_20"
+                android:layout_marginEnd="@dimen/base_8"
+                app:hint="Имя"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/surname"
+                />
+
+            <ru.breffi.storyidsample.ui.widget.StaticHintEditText
+                android:id="@+id/patronymic"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/base_8"
+                android:layout_marginTop="@dimen/base_20"
+                android:layout_marginEnd="@dimen/base_8"
+                app:hint="Отчество"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/name"
+                />
+
+            <ru.breffi.storyidsample.ui.widget.StaticHintEditText
+                android:id="@+id/phone"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/base_8"
+                android:layout_marginTop="@dimen/base_20"
+                android:layout_marginEnd="@dimen/base_8"
+                android:layout_marginBottom="@dimen/base_30"
+                app:hint="Номер телефона"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/patronymic"
+                />
+
+            <ru.breffi.storyidsample.ui.widget.StaticHintEditText
+                android:id="@+id/email"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/base_8"
+                android:layout_marginTop="@dimen/base_20"
+                android:layout_marginEnd="@dimen/base_8"
+                android:layout_marginBottom="@dimen/base_30"
+                app:hint="E-mail"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/phone"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/buttonSave"
+            style="@style/Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="58dp"
+            android:layout_marginStart="@dimen/base_16"
+            android:layout_marginTop="@dimen/base_64"
+            android:layout_marginEnd="@dimen/base_16"
+            android:layout_marginBottom="@dimen/base_64"
+            android:background="@color/red"
+            android:text="@string/button_save_changes"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fieldsLayout"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

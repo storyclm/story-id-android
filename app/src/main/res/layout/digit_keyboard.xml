@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/digitGroup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <ru.breffi.storyidsample.ui.widget.PinDigitView
+        android:id="@+id/digit1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/digit2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:number="1"
+        />
+
+    <ru.breffi.storyidsample.ui.widget.PinDigitView
+        android:id="@+id/digit2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:chars="ABC"
+        app:layout_constraintEnd_toStartOf="@+id/digit3"
+        app:layout_constraintStart_toEndOf="@+id/digit1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:number="2"
+        />
+
+    <ru.breffi.storyidsample.ui.widget.PinDigitView
+        android:id="@+id/digit3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:chars="DEF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/digit2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:number="3"
+        />
+
+    <ru.breffi.storyidsample.ui.widget.PinDigitView
+        android:id="@+id/digit4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_0"
+        app:chars="GHI"
+        app:layout_constraintEnd_toStartOf="@+id/digit5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/digit1"
+        app:number="4"
+        />
+
+    <ru.breffi.storyidsample.ui.widget.PinDigitView
+        android:id="@+id/digit5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_0"
+        app:chars="JKL"
+        app:layout_constraintEnd_toStartOf="@+id/digit6"
+        app:layout_constraintStart_toEndOf="@+id/digit4"
+        app:layout_constraintTop_toBottomOf="@id/digit2"
+        app:number="5"
+        />
+
+    <ru.breffi.storyidsample.ui.widget.PinDigitView
+        android:id="@+id/digit6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_0"
+        app:chars="MNO"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/digit5"
+        app:layout_constraintTop_toBottomOf="@id/digit3"
+        app:number="6"
+        />
+
+    <ru.breffi.storyidsample.ui.widget.PinDigitView
+        android:id="@+id/digit7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_0"
+        app:chars="PQRS"
+        app:layout_constraintEnd_toStartOf="@+id/digit8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/digit4"
+        app:number="7"
+        />
+
+    <ru.breffi.storyidsample.ui.widget.PinDigitView
+        android:id="@+id/digit8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_0"
+        app:chars="TUV"
+        app:layout_constraintEnd_toStartOf="@+id/digit9"
+        app:layout_constraintStart_toEndOf="@+id/digit7"
+        app:layout_constraintTop_toBottomOf="@id/digit5"
+        app:number="8"
+        />
+
+    <ru.breffi.storyidsample.ui.widget.PinDigitView
+        android:id="@+id/digit9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_0"
+        app:chars="WXYZ"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/digit8"
+        app:layout_constraintTop_toBottomOf="@id/digit6"
+        app:number="9"
+        />
+
+    <ru.breffi.storyidsample.ui.widget.PinDigitView
+        android:id="@+id/digitStar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_0"
+        app:layout_constraintEnd_toStartOf="@+id/digit0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/digit7"
+        app:number="*"
+        />
+
+    <ru.breffi.storyidsample.ui.widget.PinDigitView
+        android:id="@+id/digit0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_0"
+        app:chars="+"
+        app:layout_constraintEnd_toStartOf="@+id/digitSharp"
+        app:layout_constraintStart_toEndOf="@+id/digitStar"
+        app:layout_constraintTop_toBottomOf="@id/digit8"
+        app:number="0"
+        />
+
+    <ru.breffi.storyidsample.ui.widget.PinDigitView
+        android:id="@+id/digitSharp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/digit0"
+        app:layout_constraintTop_toBottomOf="@id/digit9"
+        app:number="#"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

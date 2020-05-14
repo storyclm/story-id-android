@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:id="@+id/toolbarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <include layout="@layout/include_app_bar" />
+
+        <View
+            android:id="@+id/appBarShadow"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:background="@drawable/top_shadow"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/putCodeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_54"
+        android:text="@string/text_put_pin"
+        android:textAppearance="@style/RobotoRegular.12"
+        android:textColor="@color/black_new"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarLayout"
+        />
+
+    <RatingBar
+        android:id="@+id/pinBar"
+        style="@style/ImageRatingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/base_12"
+        android:layout_marginTop="@dimen/base_12"
+        android:isIndicator="true"
+        android:numStars="4"
+        android:progressDrawable="@drawable/pin_selector"
+        android:rating="0"
+        android:stepSize="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/putCodeLabel"
+        />
+
+    <ru.breffi.storyidsample.ui.widget.DigitKeyboard
+        android:id="@+id/digitKeyboard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pinBar"
+        />
+
+    <TextView
+        android:id="@+id/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/base_16"
+        android:text="@string/label_delete"
+        android:textAppearance="@style/RobotoRegular.14"
+        android:textColor="@color/black_new"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/digitKeyboard"
+        />
+
+    <TextView
+        android:id="@+id/forgetPin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/base_26"
+        android:padding="@dimen/base_16"
+        android:text="@string/label_forget_code"
+        android:textAppearance="@style/RobotoRegular.11"
+        android:textColor="#666666"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

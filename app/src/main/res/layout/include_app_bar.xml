@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/appbarbase"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/toolbar_color"
+    android:orientation="vertical"
+    app:elevation="@dimen/base_0"
+    >
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:contentInsetStartWithNavigation="0dp">
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/base_24"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/RobotoMedium.20"
+            android:textColor="@color/white"
+            tools:ignore="RtlCompat"
+            tools:text="Toolbar Title"
+            />
+
+    </androidx.appcompat.widget.Toolbar>
+
+</com.google.android.material.appbar.AppBarLayout>

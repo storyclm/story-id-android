@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="VerCodeEditText">
+        <attr name="figures" format="integer" />
+        <attr name="verCodeMargin" format="dimension" />
+        <attr name="bottomLineSelectedColor" format="reference" />
+        <attr name="bottomLineNormalColor" format="reference" />
+        <attr name="bottomLineHeight" format="dimension" />
+        <attr name="verBackgroundColor" format="reference" />
+        <attr name="selectedBackgroundColor" format="reference" />
+        <attr name="cursorDuration" format="integer" />
+        <attr name="cursorWidth" format="dimension" />
+        <attr name="cursorColor" format="color|reference" />
+    </declare-styleable>
+
+    <declare-styleable name="PinDigitView">
+        <attr name="number" format="string" />
+        <attr name="chars" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="CheckBoxClarification">
+        <attr name="title" format="string|reference" />
+        <attr name="label" format="string|reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="StaticHintEditText">
+        <attr name="hint" format="string|reference" />
+        <attr name="text" format="string|reference" />
+        <attr name="textHint" format="string|reference" />
+    </declare-styleable>
+
+</resources>

@@ -1,0 +1,82 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group='com.github.storyclm'
+version='0.5.0'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        minSdkVersion 23
+        targetSdkVersion 29
+        versionCode 1
+        versionName version
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+ext {
+    room_version = "2.2.5"
+
+    oltu_version = "1.0.1"
+    retrofit_version = "2.3.0"
+    swagger_annotations_version = "1.5.22"
+    junit_version = "4.13"
+    jodatime_version = "2.9.9"
+    json_fire_version = "1.8.0"
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.2.0'
+
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.1'
+    implementation 'androidx.security:security-crypto:1.0.0-beta01'
+    implementation('com.auth0.android:jwtdecode:1.4.0') {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+    }
+
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+
+    //generated api dependencies
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-scalars:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "io.swagger:swagger-annotations:$swagger_annotations_version"
+    implementation "com.google.code.findbugs:jsr305:3.0.2"
+    implementation ("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:$oltu_version"){
+        exclude group:'org.apache.oltu.oauth2' , module: 'org.apache.oltu.oauth2.common'
+    }
+    implementation "io.gsonfire:gson-fire:$json_fire_version"
+    implementation "joda-time:joda-time:$jodatime_version"
+}
+
+task generateApiTask(type: Exec) {
+    workingDir "$projectDir"
+    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+        commandLine 'cmd', 'generate_api_script.sh'
+    } else {
+        commandLine 'sh', 'generate_api_script.sh'
+    }
+}

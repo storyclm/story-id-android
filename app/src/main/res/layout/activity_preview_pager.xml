@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/content_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <LinearLayout
+            android:id="@+id/controls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            >
+
+            <me.relex.circleindicator.CircleIndicator
+                android:id="@+id/indicator"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/base_48"
+                app:ci_animator="@animator/scale_with_alpha"
+                app:ci_drawable="@drawable/ci_selected"
+                app:ci_drawable_unselected="@drawable/ci_unselected"
+                app:ci_margin="@dimen/base_12"
+                />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/base_20"
+            android:layout_marginTop="41dp"
+            android:src="@drawable/ic_back_arrow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <ImageView
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/base_20"
+            android:layout_marginTop="41dp"
+            android:src="@drawable/ic_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
