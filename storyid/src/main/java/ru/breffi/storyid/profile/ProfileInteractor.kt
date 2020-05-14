@@ -140,183 +140,256 @@ class ProfileInteractor internal constructor(
     }
 
     private fun syncProfileData(metadata: Metadata, mapper: ProfileDtoMapper): ProfileDbModel? {
-        var inboundDto = apiServiceProvider.getProfileApi().profile.get()
-        val dbModel = profileDataDao.getUserProfile(metadata.userId)
+        val result = apiServiceProvider.getProfileApi().profile.get()
+        if (result != null) {
+            val inboundDto = result.data
+            val dbModel = profileDataDao.getUserProfile(metadata.userId)
 
-        if (dataIsUpToDate(dbModel?.modifiedAt, inboundDto.modifiedAt?.millis)) return null
+            if (dataIsUpToDate(dbModel?.modifiedAt, inboundDto?.modifiedAt?.millis)) return null
 
-        if (dbModel != null && dbModel.modifiedAt > inboundDto.modifiedAt?.millis ?: 0) {
-            val outboundDto = StoryProfileDTO()
-            outboundDto.email = dbModel.email
-            outboundDto.emailVerified = dbModel.emailVerified
-            outboundDto.phone = dbModel.phone
-            outboundDto.phoneVerified = dbModel.phoneVerified
-            outboundDto.username = dbModel.username
-            inboundDto = apiServiceProvider.getProfileApi().updateProfile(outboundDto).get()
+            return if (dbModel != null && dbModel.modifiedAt > inboundDto?.modifiedAt?.millis ?: 0) {
+                val outboundDto = StoryProfileDTO()
+                outboundDto.email = dbModel.email
+                outboundDto.emailVerified = dbModel.emailVerified
+                outboundDto.phone = dbModel.phone
+                outboundDto.phoneVerified = dbModel.phoneVerified
+                outboundDto.username = dbModel.username
+                apiServiceProvider.getProfileApi().updateProfile(outboundDto).get()?.data?.let {
+                    mapper.getUpdatedProfileDbModel(it, dbModel)
+                }
+            } else if (inboundDto != null) {
+                mapper.getUpdatedProfileDbModel(inboundDto, dbModel)
+            } else {
+                null
+            }
+        } else {
+            return null
         }
-        return mapper.getUpdatedProfileDbModel(inboundDto, dbModel)
     }
 
     private fun syncDemographicsData(metadata: Metadata, mapper: ProfileDtoMapper): DemographicsDbModel? {
-        var inboundDto = apiServiceProvider.getProfileDemographicsApi().demographics.get()
-        val dbModel = profileDataDao.getUserDemographics(metadata.userId)
+        val result = apiServiceProvider.getProfileDemographicsApi().demographics.get()
+        if (result != null) {
+            val inboundDto = result.data
+            val dbModel = profileDataDao.getUserDemographics(metadata.userId)
 
-        if (dataIsUpToDate(dbModel?.modifiedAt, inboundDto.modifiedAt?.millis)) return null
+            if (dataIsUpToDate(dbModel?.modifiedAt, inboundDto?.modifiedAt?.millis)) return null
 
-        if (dbModel != null && dbModel.modifiedAt > inboundDto.modifiedAt?.millis ?: 0) {
-            val outboundDto = StoryDemographicsDTO()
-            outboundDto.name = dbModel.name
-            outboundDto.surname = dbModel.surname
-            outboundDto.patronymic = dbModel.patronymic
-            outboundDto.gender = dbModel.gender
-            outboundDto.birthday = DateTime(dbModel.birthday)
-            inboundDto = apiServiceProvider.getProfileDemographicsApi().updateDemographics(outboundDto).get()
+            return if (dbModel != null && dbModel.modifiedAt > inboundDto?.modifiedAt?.millis ?: 0) {
+                val outboundDto = StoryDemographicsDTO()
+                outboundDto.name = dbModel.name
+                outboundDto.surname = dbModel.surname
+                outboundDto.patronymic = dbModel.patronymic
+                outboundDto.gender = dbModel.gender
+                outboundDto.birthday = DateTime(dbModel.birthday)
+                apiServiceProvider.getProfileDemographicsApi().updateDemographics(outboundDto).get()?.data?.let {
+                    mapper.getUpdatedDemographicsDbModel(it, dbModel)
+                }
+            } else if (inboundDto != null) {
+                mapper.getUpdatedDemographicsDbModel(inboundDto, dbModel)
+            } else {
+                null
+            }
+        } else {
+            return null
         }
-        return mapper.getUpdatedDemographicsDbModel(inboundDto, dbModel)
     }
 
     private fun syncItnData(metadata: Metadata, mapper: ProfileDtoMapper): ItnUpdateModel? {
-        var inboundDto = apiServiceProvider.getProfileItnApi().itn.get()
-        val dbModel = profileDataDao.getUserItn(metadata.userId)
+        val result = apiServiceProvider.getProfileItnApi().itn.get()
+        if (result != null) {
+            val inboundDto = result.data
+            val dbModel = profileDataDao.getUserItn(metadata.userId)
 
-        if (dataIsUpToDate(dbModel?.modifiedAt, inboundDto.modifiedAt?.millis)) return null
+            if (dataIsUpToDate(dbModel?.modifiedAt, inboundDto?.modifiedAt?.millis)) return null
 
-        var fileAction = FileAction.NO_OP
-        var filename = dbModel?.fileName
-        if (dbModel != null && dbModel.modifiedAt > inboundDto.modifiedAt?.millis ?: 0) {
-            val outboundDto = StoryITNDTO()
-            outboundDto.itn = dbModel.itn
-            inboundDto = apiServiceProvider.getProfileItnApi().setItn(outboundDto).get()
-            if (dbModel.fileName != null) {
-                val file = fileHelper.getFile(dbModel.fileName)
-                val result = auxApi.putItnImageAsync(AuxApi.createFilePart(file)).execute()
+            var fileAction = FileAction.NO_OP
+            var filename = dbModel?.fileName
+            if (dbModel != null && dbModel.modifiedAt > inboundDto?.modifiedAt?.millis ?: 0) {
+                val outboundDto = StoryITNDTO()
+                outboundDto.itn = dbModel.itn
+                return apiServiceProvider.getProfileItnApi().setItn(outboundDto).get()?.data?.let {
+                    if (dbModel.fileName != null) {
+                        val file = fileHelper.getFile(dbModel.fileName)
+                        val result = auxApi.putItnImageAsync(AuxApi.createFilePart(file)).execute()
+                    } else {
+                        val result = auxApi.deleteItnImageAsync().execute()
+                    }
+                    val updatedDbModel = mapper.getUpdatedItnDbModel(it, dbModel, filename)
+                    ItnUpdateModel(updatedDbModel, fileAction)
+                }
+            } else if (inboundDto != null) {
+                if (inboundDto.size ?: 0 == 0L) {
+                    fileAction = FileAction.DELETE
+                    filename = null
+                } else {
+                    try {
+                        auxApi.getItnImageAsync().execute().body()?.let { itnImage ->
+                            val bitmap = BitmapFactory.decodeStream(itnImage.byteStream())
+                            fileHelper.copyFromBitmap(bitmap, FileHelper.itnFilename(true))
+                            fileAction = FileAction.COPY_FROM_TMP
+                            filename = FileHelper.itnFilename()
+                        }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                }
+                val updatedDbModel = mapper.getUpdatedItnDbModel(inboundDto, dbModel, filename)
+                return ItnUpdateModel(updatedDbModel, fileAction)
             } else {
-                val result = auxApi.deleteItnImageAsync().execute()
+                return null
             }
         } else {
-            if (inboundDto.size ?: 0 == 0L) {
-                fileAction = FileAction.DELETE
-                filename = null
-            } else {
-                try {
-                    auxApi.getItnImageAsync().execute().body()?.let { itnImage ->
-                        val bitmap = BitmapFactory.decodeStream(itnImage.byteStream())
-                        fileHelper.copyFromBitmap(bitmap, FileHelper.itnFilename(true))
-                        fileAction = FileAction.COPY_FROM_TMP
-                        filename = FileHelper.itnFilename()
-                    }
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            }
+            return null
         }
-        val updatedDbModel = mapper.getUpdatedItnDbModel(inboundDto, dbModel, filename)
-        return ItnUpdateModel(updatedDbModel, fileAction)
     }
 
     private fun syncSnilsData(metadata: Metadata, mapper: ProfileDtoMapper): SnilsUpdateModel? {
-        var inboundDto = apiServiceProvider.getProfileSnilsApi().snils.get()
-        val dbModel = profileDataDao.getUserSnils(metadata.userId)
+        val result = apiServiceProvider.getProfileSnilsApi().snils.get()
+        if (result != null) {
+            val inboundDto = result.data
+            val dbModel = profileDataDao.getUserSnils(metadata.userId)
 
-        if (dataIsUpToDate(dbModel?.modifiedAt, inboundDto.modifiedAt?.millis)) return null
+            if (dataIsUpToDate(dbModel?.modifiedAt, inboundDto?.modifiedAt?.millis)) return null
 
-        var fileAction = FileAction.NO_OP
-        var filename = dbModel?.fileName
-        if (dbModel != null && dbModel.modifiedAt > inboundDto.modifiedAt?.millis ?: 0) {
-            val outboundDto = StorySNILSDTO()
-            outboundDto.snils = dbModel.snils
-            inboundDto = apiServiceProvider.getProfileSnilsApi().setSnils(outboundDto).get()
-            if (dbModel.fileName != null) {
-                val file = fileHelper.getFile(dbModel.fileName)
-                val result = auxApi.putSnilsImageAsync(AuxApi.createFilePart(file)).execute()
+            var fileAction = FileAction.NO_OP
+            var filename = dbModel?.fileName
+            if (dbModel != null && dbModel.modifiedAt > inboundDto?.modifiedAt?.millis ?: 0) {
+                val outboundDto = StorySNILSDTO()
+                outboundDto.snils = dbModel.snils
+                return apiServiceProvider.getProfileSnilsApi().setSnils(outboundDto).get()?.data?.let {
+                    if (dbModel.fileName != null) {
+                        val file = fileHelper.getFile(dbModel.fileName)
+                        val result = auxApi.putSnilsImageAsync(AuxApi.createFilePart(file)).execute()
+                    } else {
+                        val result = auxApi.deleteSnilsImageAsync().execute()
+                    }
+                    val updatedDbModel = mapper.getUpdatedSnilsDbModel(it, dbModel, filename)
+                    return SnilsUpdateModel(updatedDbModel, fileAction)
+                }
+            } else if (inboundDto != null) {
+                if (inboundDto.size ?: 0 == 0L) {
+                    fileAction = FileAction.DELETE
+                    filename = null
+                } else {
+                    try {
+                        auxApi.getSnilsImageAsync().execute().body()?.let { itnImage ->
+                            val bitmap = BitmapFactory.decodeStream(itnImage.byteStream())
+                            fileHelper.copyFromBitmap(bitmap, FileHelper.snilsFilename(true))
+                            fileAction = FileAction.COPY_FROM_TMP
+                            filename = FileHelper.snilsFilename()
+                        }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                }
+                val updatedDbModel = mapper.getUpdatedSnilsDbModel(inboundDto, dbModel, filename)
+                return SnilsUpdateModel(updatedDbModel, fileAction)
             } else {
-                val result = auxApi.deleteSnilsImageAsync().execute()
+                return null
             }
         } else {
-            if (inboundDto.size ?: 0 == 0L) {
-                fileAction = FileAction.DELETE
-                filename = null
-            } else {
-                try {
-                    auxApi.getSnilsImageAsync().execute().body()?.let { itnImage ->
-                        val bitmap = BitmapFactory.decodeStream(itnImage.byteStream())
-                        fileHelper.copyFromBitmap(bitmap, FileHelper.snilsFilename(true))
-                        fileAction = FileAction.COPY_FROM_TMP
-                        filename = FileHelper.snilsFilename()
-                    }
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            }
+            return null
         }
-        val updatedDbModel = mapper.getUpdatedSnilsDbModel(inboundDto, dbModel, filename)
-        return SnilsUpdateModel(updatedDbModel, fileAction)
     }
 
     private fun syncPassportData(metadata: Metadata, mapper: ProfileDtoMapper): PassportUpdateModel? {
-        var inboundDto = apiServiceProvider.getProfilePassportApi().pasport.get()
-        val dbModel = profileDataDao.getUserPassport(metadata.userId)
+        val result = apiServiceProvider.getProfilePassportApi().pasport.get()
+        if (result != null) {
+            val inboundDto = result.data
+            val dbModel = profileDataDao.getUserPassport(metadata.userId)
 
-        if (dataIsUpToDate(dbModel?.modifiedAt, inboundDto.modifiedAt?.millis)) return null
+            if (dataIsUpToDate(dbModel?.modifiedAt, inboundDto?.modifiedAt?.millis)) return null
 
-        val pageDbModels = profileDataDao.getUserPassportPages(metadata.userId)
-        val fileActions = mutableMapOf<Int, FileAction>()
-        val pageFileNames = pageDbModels.associateBy({ it.page }, { it.fileName }).toMutableMap()
-        if (dbModel != null && dbModel.modifiedAt > inboundDto.modifiedAt?.millis ?: 0) {
-            val outboundDto = StoryPasportDTO()
-            outboundDto.code = dbModel.code
-            outboundDto.sn = dbModel.sn
-            outboundDto.issuedAt = DateTime(dbModel.issuedAt)
-            outboundDto.issuedBy = dbModel.issuedBy
-            pageDbModels.forEach { pageDbModel ->
-                val outboundPageDto = StoryPasportPageViewModel()
-                outboundPageDto.page = pageDbModel.page
-                outboundPageDto.modifiedAt = DateTime(metadata.timestamp)
-                outboundPageDto.modifiedBy = metadata.userId
-                outboundDto.addPagesItem(outboundPageDto)
-            }
-            inboundDto = apiServiceProvider.getProfilePassportApi().setPasport(outboundDto).get()
-            pageDbModels.forEach { pageDbModel ->
-                if (pageDbModel.fileName != null) {
-                    val file = fileHelper.getFile(pageDbModel.fileName)
-                    val result = auxApi.putPassportImageAsync(pageDbModel.page, AuxApi.createFilePart(file)).execute()
-                } else {
-                    val result = auxApi.deletePassportImageAsync(pageDbModel.page).execute()
+            val pageDbModels = profileDataDao.getUserPassportPages(metadata.userId)
+            val fileActions = mutableMapOf<Int, FileAction>()
+            val pageFileNames = pageDbModels.associateBy({ it.page }, { it.fileName }).toMutableMap()
+            if (dbModel != null && dbModel.modifiedAt > inboundDto?.modifiedAt?.millis ?: 0) {
+                val outboundDto = StoryPasportDTO()
+                outboundDto.code = dbModel.code
+                outboundDto.sn = dbModel.sn
+                outboundDto.issuedAt = DateTime(dbModel.issuedAt)
+                outboundDto.issuedBy = dbModel.issuedBy
+                pageDbModels.forEach { pageDbModel ->
+                    val outboundPageDto = StoryPasportPageViewModel()
+                    outboundPageDto.page = pageDbModel.page
+                    outboundPageDto.modifiedAt = DateTime(metadata.timestamp)
+                    outboundPageDto.modifiedBy = metadata.userId
+                    outboundDto.addPagesItem(outboundPageDto)
                 }
-            }
-        } else {
-            if (inboundDto.pages == null) {
-                fileActions[1] = FileAction.DELETE
-                fileActions[2] = FileAction.DELETE
-                profileDataDao.deletePassportPages()
-            } else {
-                inboundDto.pages?.forEach { page ->
-                    if (page.size ?: 0 == 0L) {
-                        fileActions[page.page] = FileAction.DELETE
-                        pageFileNames[page.page] = null
-                    } else {
-                        try {
-                            auxApi.getPassportImageAsync(page.page).execute().body()?.let { pageImage ->
-                                val bitmap = BitmapFactory.decodeStream(pageImage.byteStream())
-                                fileHelper.copyFromBitmap(bitmap, FileHelper.passportPageFilename(page.page, true))
-                                fileActions[page.page] = FileAction.COPY_FROM_TMP
-                                pageFileNames[page.page] = FileHelper.passportPageFilename(page.page)
+                return apiServiceProvider.getProfilePassportApi().setPasport(outboundDto).get()?.data?.let { setResultDto ->
+                    pageDbModels.forEach { pageDbModel ->
+                        if (pageDbModel.fileName != null) {
+                            val file = fileHelper.getFile(pageDbModel.fileName)
+                            val result = auxApi.putPassportImageAsync(
+                                pageDbModel.page,
+                                AuxApi.createFilePart(file)
+                            ).execute()
+                        } else {
+                            val result = auxApi.deletePassportImageAsync(pageDbModel.page).execute()
+                        }
+                    }
+                    val pageUpdateModels = setResultDto.pages
+                        ?.map { inboundPage ->
+                            mapper.getUpdatedPassportPageDbModel(
+                                inboundPage,
+                                pageDbModels.find { it.page == inboundPage.page },
+                                pageFileNames[inboundPage.page]
+                            )
+                        }
+                        ?.map { PassportPageUpdateModel(it, fileActions[it.page] ?: FileAction.NO_OP) }
+                        ?: listOf()
+                    val updatedDbModel = mapper.getUpdatedPassportDbModel(setResultDto, dbModel)
+                    PassportUpdateModel(updatedDbModel, pageUpdateModels)
+                }
+            } else if (inboundDto != null) {
+                if (inboundDto.pages == null) {
+                    fileActions[1] = FileAction.DELETE
+                    fileActions[2] = FileAction.DELETE
+                    profileDataDao.deletePassportPages()
+                } else {
+                    inboundDto.pages?.forEach { page ->
+                        if (page.size ?: 0 == 0L) {
+                            fileActions[page.page] = FileAction.DELETE
+                            pageFileNames[page.page] = null
+                        } else {
+                            try {
+                                auxApi.getPassportImageAsync(page.page).execute().body()
+                                    ?.let { pageImage ->
+                                        val bitmap =
+                                            BitmapFactory.decodeStream(pageImage.byteStream())
+                                        fileHelper.copyFromBitmap(
+                                            bitmap,
+                                            FileHelper.passportPageFilename(page.page, true)
+                                        )
+                                        fileActions[page.page] = FileAction.COPY_FROM_TMP
+                                        pageFileNames[page.page] =
+                                            FileHelper.passportPageFilename(page.page)
+                                    }
+                            } catch (e: IOException) {
+                                e.printStackTrace()
                             }
-                        } catch (e: IOException) {
-                            e.printStackTrace()
                         }
                     }
                 }
+                val pageUpdateModels = inboundDto.pages
+                    ?.map { inboundPage ->
+                        mapper.getUpdatedPassportPageDbModel(
+                            inboundPage,
+                            pageDbModels.find { it.page == inboundPage.page },
+                            pageFileNames[inboundPage.page]
+                        )
+                    }
+                    ?.map { PassportPageUpdateModel(it, fileActions[it.page] ?: FileAction.NO_OP) }
+                    ?: listOf()
+                val updatedDbModel = mapper.getUpdatedPassportDbModel(inboundDto, dbModel)
+                return PassportUpdateModel(updatedDbModel, pageUpdateModels)
+            } else {
+                return null
             }
+        } else {
+            return null
         }
-        val pageUpdateModels = inboundDto.pages
-            ?.map { inboundPage ->
-                mapper.getUpdatedPassportPageDbModel(inboundPage, pageDbModels.find { it.page == inboundPage.page }, pageFileNames[inboundPage.page])
-            }
-            ?.map { PassportPageUpdateModel(it, fileActions[it.page] ?: FileAction.NO_OP) }
-            ?: listOf()
-        val updatedDbModel = mapper.getUpdatedPassportDbModel(inboundDto, dbModel)
-        return PassportUpdateModel(updatedDbModel, pageUpdateModels)
     }
 
     /**
@@ -329,9 +402,10 @@ class ProfileInteractor internal constructor(
             bankAccountsSyncInProgress.set(true)
             authDataProvider.getAuthData()?.userId?.let { userId ->
                 val metadata = Metadata(userId, System.currentTimeMillis())
-                val updateModel = syncBankAccountsData(metadata)
-                bankAccountsLock.withLock {
-                    executeLocalBankAccountUpdate(updateModel)
+                syncBankAccountsData(metadata)?.let {
+                    bankAccountsLock.withLock {
+                        executeLocalBankAccountUpdate(it)
+                    }
                 }
             }
         } finally {
@@ -339,48 +413,50 @@ class ProfileInteractor internal constructor(
         }
     }
 
-    private fun syncBankAccountsData(metadata: Metadata): BankAccountsUpdateModel {
-        val mapper = BankAccountMapper(metadata)
-        val inboundDtoList = apiServiceProvider.getProfileBankAccountsApi().listBankAccounts().get()
-        val inboundDtoMap = inboundDtoList.associateBy { it.id }
-        val dbModels = bankAccountDataDao.getUserBankAccounts(metadata.userId)
-        val modelsToInsert = mutableListOf<BankAccountDbModel>()
-        val modelIdsToDelete = mutableListOf<String>()
-        dbModels.forEach { dbModel ->
-            if (dbModel.id == null) {
-                val outboundDto = mapper.getDto(dbModel)
-                val resultDto = apiServiceProvider.getProfileBankAccountsApi().createBankAccount(outboundDto).get()
-                modelsToInsert.add(mapper.getUpdatedDbModel(dbModel, resultDto))
-            } else {
-                val inboundDto = inboundDtoMap[dbModel.id]
-                if (inboundDto != null) {
-                    if (!dataIsUpToDate(dbModel.modifiedAt, inboundDto.modifiedAt?.millis)) {
-                        if (dbModel.modifiedAt > inboundDto.modifiedAt?.millis ?: 0) {
-                            if (dbModel.deleted) {
-                                val result = apiServiceProvider.getProfileBankAccountsApi().deleteBankAccountById(dbModel.id).execute()
-                            } else {
-                                val outboundDto = mapper.getDto(dbModel)
-                                val resultDto = apiServiceProvider.getProfileBankAccountsApi().updateBankAccount(dbModel.id, outboundDto).get()
-                                modelsToInsert.add(mapper.getUpdatedDbModel(dbModel, resultDto))
-                            }
-                        } else {
-                            modelsToInsert.add(mapper.getUpdatedDbModel(dbModel, inboundDto))
-                        }
+    private fun syncBankAccountsData(metadata: Metadata): BankAccountsUpdateModel? {
+        return apiServiceProvider.getProfileBankAccountsApi().listBankAccounts().get()?.data?.let { inboundDtoList ->
+            val inboundDtoMap = inboundDtoList.associateBy { it.id }
+            val dbModels = bankAccountDataDao.getUserBankAccounts(metadata.userId)
+            val modelsToInsert = mutableListOf<BankAccountDbModel>()
+            val modelIdsToDelete = mutableListOf<String>()
+            val mapper = BankAccountMapper(metadata)
+            dbModels.forEach { dbModel ->
+                if (dbModel.id == null) {
+                    val outboundDto = mapper.getDto(dbModel)
+                    apiServiceProvider.getProfileBankAccountsApi().createBankAccount(outboundDto).get()?.data?.let { resultDto ->
+                        modelsToInsert.add(mapper.getUpdatedDbModel(dbModel, resultDto))
                     }
                 } else {
-                    modelIdsToDelete.add(dbModel.id)
+                    val inboundDto = inboundDtoMap[dbModel.id]
+                    if (inboundDto != null) {
+                        if (!dataIsUpToDate(dbModel.modifiedAt, inboundDto.modifiedAt?.millis)) {
+                            if (dbModel.modifiedAt > inboundDto.modifiedAt?.millis ?: 0) {
+                                if (dbModel.deleted) {
+                                    val result = apiServiceProvider.getProfileBankAccountsApi().deleteBankAccountById(dbModel.id).execute()
+                                } else {
+                                    val outboundDto = mapper.getDto(dbModel)
+                                    apiServiceProvider.getProfileBankAccountsApi().updateBankAccount(dbModel.id, outboundDto).get()?.data?.let { resultDto ->
+                                        modelsToInsert.add(mapper.getUpdatedDbModel(dbModel, resultDto))
+                                    }
+                                }
+                            } else {
+                                modelsToInsert.add(mapper.getUpdatedDbModel(dbModel, inboundDto))
+                            }
+                        }
+                    } else {
+                        modelIdsToDelete.add(dbModel.id)
+                    }
                 }
             }
+
+            val dbModelMap = dbModels.associateBy { it.id }
+            inboundDtoList
+                .filter { !dbModelMap.containsKey(it.id) }
+                .forEach { inboundDto ->
+                    modelsToInsert.add(mapper.getUpdatedDbModel(null, inboundDto))
+                }
+            BankAccountsUpdateModel(modelsToInsert, modelIdsToDelete)
         }
-
-        val dbModelMap = dbModels.associateBy { it.id }
-        inboundDtoList
-            .filter { !dbModelMap.containsKey(it.id) }
-            .forEach { inboundDto ->
-                modelsToInsert.add(mapper.getUpdatedDbModel(null, inboundDto))
-            }
-
-        return BankAccountsUpdateModel(modelsToInsert, modelIdsToDelete)
     }
 
     private fun executeLocalBankAccountUpdate(bankAccountsUpdateModel: BankAccountsUpdateModel) {
