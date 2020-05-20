@@ -1,5 +1,6 @@
 package ru.breffi.storyid.profile
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import org.joda.time.DateTime
 import ru.breffi.storyid.auth.common.AuthDataProvider
@@ -211,9 +212,13 @@ class ProfileInteractor internal constructor(
                 return apiServiceProvider.getProfileItnApi().setItn(outboundDto).get()?.data?.let {
                     if (dbModel.fileName != null) {
                         val file = fileHelper.getFile(dbModel.fileName)
-                        val result = auxApi.putItnImageAsync(AuxApi.createFilePart(file)).execute()
+                        if (!auxApi.putItnImageAsync(AuxApi.createFilePart(file)).execute().isSuccessful) {
+                            return null
+                        }
                     } else {
-                        val result = auxApi.deleteItnImageAsync().execute()
+                        if (!auxApi.deleteItnImageAsync().execute().isSuccessful) {
+                            return null
+                        }
                     }
                     val updatedDbModel = mapper.getUpdatedItnDbModel(it, dbModel, filename)
                     ItnUpdateModel(updatedDbModel, fileAction)
@@ -225,13 +230,22 @@ class ProfileInteractor internal constructor(
                 } else {
                     try {
                         auxApi.getItnImageAsync().execute().body()?.let { itnImage ->
-                            val bitmap = BitmapFactory.decodeStream(itnImage.byteStream())
-                            fileHelper.copyFromBitmap(bitmap, FileHelper.itnFilename(true))
-                            fileAction = FileAction.COPY_FROM_TMP
-                            filename = FileHelper.itnFilename()
+                            val bitmap: Bitmap? = BitmapFactory.decodeStream(itnImage.byteStream())
+                            if (bitmap != null) {
+                                fileHelper.copyFromBitmap(bitmap, FileHelper.itnFilename(true))
+                                fileAction = FileAction.COPY_FROM_TMP
+                                filename = FileHelper.itnFilename()
+                            } else {
+                                if (!auxApi.deleteItnImageAsync().execute().isSuccessful) {
+                                    return null
+                                }
+                                fileAction = FileAction.DELETE
+                                filename = null
+                            }
                         }
                     } catch (e: IOException) {
                         e.printStackTrace()
+                        return null
                     }
                 }
                 val updatedDbModel = mapper.getUpdatedItnDbModel(inboundDto, dbModel, filename)
@@ -260,9 +274,13 @@ class ProfileInteractor internal constructor(
                 return apiServiceProvider.getProfileSnilsApi().setSnils(outboundDto).get()?.data?.let {
                     if (dbModel.fileName != null) {
                         val file = fileHelper.getFile(dbModel.fileName)
-                        val result = auxApi.putSnilsImageAsync(AuxApi.createFilePart(file)).execute()
+                        if (!auxApi.putSnilsImageAsync(AuxApi.createFilePart(file)).execute().isSuccessful) {
+                            return null
+                        }
                     } else {
-                        val result = auxApi.deleteSnilsImageAsync().execute()
+                        if (!auxApi.deleteSnilsImageAsync().execute().isSuccessful) {
+                            return null
+                        }
                     }
                     val updatedDbModel = mapper.getUpdatedSnilsDbModel(it, dbModel, filename)
                     return SnilsUpdateModel(updatedDbModel, fileAction)
@@ -273,14 +291,23 @@ class ProfileInteractor internal constructor(
                     filename = null
                 } else {
                     try {
-                        auxApi.getSnilsImageAsync().execute().body()?.let { itnImage ->
-                            val bitmap = BitmapFactory.decodeStream(itnImage.byteStream())
-                            fileHelper.copyFromBitmap(bitmap, FileHelper.snilsFilename(true))
-                            fileAction = FileAction.COPY_FROM_TMP
-                            filename = FileHelper.snilsFilename()
+                        auxApi.getSnilsImageAsync().execute().body()?.let { snilsImage ->
+                            val bitmap: Bitmap? = BitmapFactory.decodeStream(snilsImage.byteStream())
+                            if (bitmap != null) {
+                                fileHelper.copyFromBitmap(bitmap, FileHelper.snilsFilename(true))
+                                fileAction = FileAction.COPY_FROM_TMP
+                                filename = FileHelper.snilsFilename()
+                            } else {
+                                if (!auxApi.deleteSnilsImageAsync().execute().isSuccessful) {
+                                    return null
+                                }
+                                fileAction = FileAction.DELETE
+                                filename = null
+                            }
                         }
                     } catch (e: IOException) {
                         e.printStackTrace()
+                        return null
                     }
                 }
                 val updatedDbModel = mapper.getUpdatedSnilsDbModel(inboundDto, dbModel, filename)
@@ -321,12 +348,13 @@ class ProfileInteractor internal constructor(
                     pageDbModels.forEach { pageDbModel ->
                         if (pageDbModel.fileName != null) {
                             val file = fileHelper.getFile(pageDbModel.fileName)
-                            val result = auxApi.putPassportImageAsync(
-                                pageDbModel.page,
-                                AuxApi.createFilePart(file)
-                            ).execute()
+                            if (!auxApi.putPassportImageAsync(pageDbModel.page, AuxApi.createFilePart(file)).execute().isSuccessful) {
+                                return null
+                            }
                         } else {
-                            val result = auxApi.deletePassportImageAsync(pageDbModel.page).execute()
+                            if (!auxApi.deletePassportImageAsync(pageDbModel.page).execute().isSuccessful) {
+                                return null
+                            }
                         }
                     }
                     val pageUpdateModels = setResultDto.pages
@@ -354,20 +382,23 @@ class ProfileInteractor internal constructor(
                             pageFileNames[page.page] = null
                         } else {
                             try {
-                                auxApi.getPassportImageAsync(page.page).execute().body()
-                                    ?.let { pageImage ->
-                                        val bitmap =
-                                            BitmapFactory.decodeStream(pageImage.byteStream())
-                                        fileHelper.copyFromBitmap(
-                                            bitmap,
-                                            FileHelper.passportPageFilename(page.page, true)
-                                        )
+                                auxApi.getPassportImageAsync(page.page).execute().body()?.let { pageImage ->
+                                    val bitmap: Bitmap? = BitmapFactory.decodeStream(pageImage.byteStream())
+                                    if (bitmap != null) {
+                                        fileHelper.copyFromBitmap(bitmap, FileHelper.passportPageFilename(page.page, true))
                                         fileActions[page.page] = FileAction.COPY_FROM_TMP
-                                        pageFileNames[page.page] =
-                                            FileHelper.passportPageFilename(page.page)
+                                        pageFileNames[page.page] = FileHelper.passportPageFilename(page.page)
+                                    } else {
+                                        if (!auxApi.deletePassportImageAsync(page.page).execute().isSuccessful) {
+                                            return null
+                                        }
+                                        fileActions[page.page] = FileAction.DELETE
+                                        pageFileNames[page.page] = null
                                     }
+                                }
                             } catch (e: IOException) {
                                 e.printStackTrace()
+                                return null
                             }
                         }
                     }
@@ -432,7 +463,9 @@ class ProfileInteractor internal constructor(
                         if (!dataIsUpToDate(dbModel.modifiedAt, inboundDto.modifiedAt?.millis)) {
                             if (dbModel.modifiedAt > inboundDto.modifiedAt?.millis ?: 0) {
                                 if (dbModel.deleted) {
-                                    val result = apiServiceProvider.getProfileBankAccountsApi().deleteBankAccountById(dbModel.id).execute()
+                                    if (!apiServiceProvider.getProfileBankAccountsApi().deleteBankAccountById(dbModel.id).execute().isSuccessful) {
+                                        return null
+                                    }
                                 } else {
                                     val outboundDto = mapper.getDto(dbModel)
                                     apiServiceProvider.getProfileBankAccountsApi().updateBankAccount(dbModel.id, outboundDto).get()?.data?.let { resultDto ->
