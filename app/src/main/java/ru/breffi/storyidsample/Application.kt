@@ -13,6 +13,7 @@ import dagger.android.HasBroadcastReceiverInjector
 import dagger.android.HasServiceInjector
 import ru.breffi.storyidsample.di.DaggerAppComponent
 import ru.breffi.storyidsample.di.StoryIdWorkerFactory
+import ru.breffi.storyidsample.repository.work.BankAccountsSyncWorker
 import ru.breffi.storyidsample.ui.common.glide.GlideFileLoader
 import ru.breffi.storyidsample.repository.work.ProfileSyncWorker
 import javax.inject.Inject
@@ -39,6 +40,7 @@ class Application : Application(), HasActivityInjector, HasServiceInjector, HasB
         Foreground[this].addListener(object : Foreground.Listener {
             override fun onBecameForeground() {
                 ProfileSyncWorker.start(applicationContext)
+                BankAccountsSyncWorker.start(applicationContext)
             }
 
             override fun onBecameBackground() {}

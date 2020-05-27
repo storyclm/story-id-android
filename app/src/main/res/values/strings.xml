@@ -80,4 +80,13 @@
         <item>Сделать фото</item>
         <item>Выбрать из галереи</item>
     </string-array>
+
+    <string name="button_bank_card_list">Список банковских карт</string>
+    <string name="title_bank_account">Новая карта</string>
+    <string name="title_bank_accounts">Список банковских карт</string>
+    <string name="button_bind_card">ПРИВЯЗАТЬ КАРТУ</string>
+    <string name="error_form_not_valid">Заполните, пожалуйста, все поля формы</string>
+    <string name="label_new_card">Новая карта</string>
+    <string name="label_create">Создать</string>
+    <string name="label_cards">Карты</string>
 </resources>

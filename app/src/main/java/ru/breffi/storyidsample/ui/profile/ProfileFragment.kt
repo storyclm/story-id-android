@@ -12,6 +12,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.fragment_profile.*
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.auth.AuthActivity
+import ru.breffi.storyidsample.ui.bank_accounts.BankAccountsFragment
 import ru.breffi.storyidsample.ui.common.glide.GlideApp
 import ru.breffi.storyidsample.ui.itn.ItnFragment
 import ru.breffi.storyidsample.ui.passport.PassportFragment
@@ -92,6 +93,10 @@ class ProfileFragment : ImageFragment() {
 
         passport.setOnClickListener {
             nextFragment(PassportFragment.newInstance())
+        }
+
+        bankAccounts.setOnClickListener {
+            nextFragment(BankAccountsFragment.newInstance())
         }
     }
 

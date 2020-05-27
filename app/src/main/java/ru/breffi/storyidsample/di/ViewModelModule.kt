@@ -8,6 +8,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 import ru.breffi.storyidsample.ui.auth.AuthViewModel
+import ru.breffi.storyidsample.ui.bank_account.BankAccountViewModel
+import ru.breffi.storyidsample.ui.bank_accounts.BankAccountsViewModel
 import ru.breffi.storyidsample.ui.itn.ItnViewModel
 import ru.breffi.storyidsample.ui.passport.PassportViewModel
 import ru.breffi.storyidsample.ui.personal_data.PersonalDataViewModel
@@ -62,6 +64,16 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(PassportViewModel::class)
     abstract fun bindPassportViewModel(viewModel: PassportViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(BankAccountsViewModel::class)
+    abstract fun bindBankAccountsViewModel(viewModel: BankAccountsViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(BankAccountViewModel::class)
+    abstract fun bindBankAccountViewModel(viewModel: BankAccountViewModel): ViewModel
 
     @Binds
     abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory

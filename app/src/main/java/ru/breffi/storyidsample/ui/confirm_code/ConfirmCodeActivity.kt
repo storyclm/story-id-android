@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.activity_confirm_code.*
 import kotlinx.android.synthetic.main.include_app_bar.*
 import ru.breffi.storyid.auth.common.model.AuthState
 import ru.breffi.storyidsample.R
+import ru.breffi.storyidsample.repository.work.BankAccountsSyncWorker
 import ru.breffi.storyidsample.utils.*
 import ru.breffi.storyidsample.valueobject.Resource
 import java.io.IOException
@@ -166,6 +167,7 @@ class ConfirmCodeActivity : BaseInjectableActivity() {
                     showProgress(false)
 
                     ProfileSyncWorker.start(applicationContext)
+                    BankAccountsSyncWorker.start(applicationContext)
 
                     timer?.cancel()
                     hideKeyboard()

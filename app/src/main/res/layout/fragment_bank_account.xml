@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <ru.breffi.storyidsample.ui.widget.StaticHintEditText
+            android:id="@+id/bic"
+            android:layout_width="@dimen/base_0"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/base_8"
+            android:layout_marginTop="@dimen/base_16"
+            android:layout_marginEnd="@dimen/base_8"
+            app:hint="БИК"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <ru.breffi.storyidsample.ui.widget.StaticHintEditText
+            android:id="@+id/bankName"
+            android:layout_width="@dimen/base_0"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/base_8"
+            android:layout_marginTop="@dimen/base_20"
+            android:layout_marginEnd="@dimen/base_8"
+            app:hint="Наименование банка"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bic"
+            />
+
+        <ru.breffi.storyidsample.ui.widget.StaticHintEditText
+            android:id="@+id/correspondentAccount"
+            android:layout_width="@dimen/base_0"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/base_8"
+            android:layout_marginTop="@dimen/base_20"
+            android:layout_marginEnd="@dimen/base_8"
+            app:hint="Корреспондентский счет"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bankName"
+            app:textHint="408-17-810-8-6010-4106702"
+            />
+
+        <ru.breffi.storyidsample.ui.widget.StaticHintEditText
+            android:id="@+id/settlementAccount"
+            android:layout_width="@dimen/base_0"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/base_8"
+            android:layout_marginTop="@dimen/base_20"
+            android:layout_marginEnd="@dimen/base_8"
+            app:hint="Номер расчетного счета"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/correspondentAccount"
+            app:textHint="408-17-810-8-6010-4106702"
+            />
+
+        <ru.breffi.storyidsample.ui.widget.StaticHintEditText
+            android:id="@+id/accountName"
+            android:layout_width="@dimen/base_0"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/base_8"
+            android:layout_marginTop="@dimen/base_20"
+            android:layout_marginEnd="@dimen/base_8"
+            app:hint="Придумайте имя для карты"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settlementAccount"
+            />
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="@dimen/base_0"
+            android:layout_height="@dimen/base_0"
+            android:layout_marginTop="@dimen/base_52"
+            app:layout_constraintBottom_toTopOf="@id/buttonSave"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/accountName"
+            />
+
+        <Button
+            android:id="@+id/buttonSave"
+            style="@style/Button"
+            android:layout_width="@dimen/base_0"
+            android:layout_height="52dp"
+            android:layout_marginStart="@dimen/base_16"
+            android:layout_marginEnd="@dimen/base_16"
+            android:layout_marginBottom="@dimen/base_50"
+            android:background="@color/colorPrimary"
+            android:text="@string/button_bind_card"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/base_8"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/white"
+            android:indeterminateTintMode="src_atop"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonSave"
+            app:layout_constraintEnd_toEndOf="@+id/buttonSave"
+            app:layout_constraintStart_toStartOf="@+id/buttonSave"
+            app:layout_constraintTop_toTopOf="@+id/buttonSave"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

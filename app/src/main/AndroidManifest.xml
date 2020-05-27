@@ -60,6 +60,11 @@
             android:exported="false"
             tools:node="remove" />
 
+        <activity
+            android:name=".ui.bank_account.BankAccountActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+
         <provider
             android:name=".components.GenericFileProvider"
             android:authorities="@string/authority"
