@@ -6,14 +6,13 @@ import org.joda.time.DateTime
 import ru.breffi.storyid.auth.common.AuthDataProvider
 import ru.breffi.storyid.generated_api.model.*
 import ru.breffi.storyid.profile.db.BankAccountDataDao
+import ru.breffi.storyid.profile.db.FilesDataDao
 import ru.breffi.storyid.profile.db.ProfileDataDao
 import ru.breffi.storyid.profile.db.dto.BankAccountDbModel
 import ru.breffi.storyid.profile.db.dto.DemographicsDbModel
 import ru.breffi.storyid.profile.db.dto.ProfileDbModel
 import ru.breffi.storyid.profile.mapper.*
-import ru.breffi.storyid.profile.model.BankAccountModel
-import ru.breffi.storyid.profile.model.CreateBankAccountModel
-import ru.breffi.storyid.profile.model.ProfileModel
+import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyid.profile.model.internal.*
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
@@ -25,6 +24,7 @@ class ProfileInteractor internal constructor(
     private val apiServiceProvider: ApiServiceProvider,
     private val profileDataDao: ProfileDataDao,
     private val bankAccountDataDao: BankAccountDataDao,
+    private val filesDataDao: FilesDataDao,
     private val authDataProvider: AuthDataProvider,
     private val fileHelper: FileHelper
 ) {
@@ -35,6 +35,8 @@ class ProfileInteractor internal constructor(
     private val profileSyncInProgress = AtomicBoolean(false)
     private val bankAccountsLock = ReentrantLock()
     private val bankAccountsSyncInProgress = AtomicBoolean(false)
+    private val filesLock = ReentrantLock()
+    private val filesSyncInProgress = AtomicBoolean(false)
 
     /**
      *  Blocking
@@ -620,13 +622,225 @@ class ProfileInteractor internal constructor(
     /**
      *  Blocking
      */
+    fun getFiles(): List<FileModel> {
+        return filesLock.withLock {
+            authDataProvider.getAuthData()?.userId?.let { userId ->
+                val mapper = FileModelMapper(fileHelper)
+                filesDataDao.getUserFiles(userId)
+                    .filter { !it.deleted }
+                    .map { mapper.mapFileModel(it) }
+            } ?: listOf()
+        }
+    }
+
+    /**
+     *  Blocking
+     */
+    fun getFile(internalId: String): FileModel? {
+        return filesLock.withLock {
+            authDataProvider.getAuthData()?.userId?.let { userId ->
+                filesDataDao.getByInternalId(internalId)?.let { fileDbModel ->
+                    if (!fileDbModel.deleted) {
+                        FileModelMapper(fileHelper).mapFileModel(fileDbModel)
+                    } else {
+                        null
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     *  Blocking
+     */
+    fun getFile(category: String, name: String): FileModel? {
+        return filesLock.withLock {
+            authDataProvider.getAuthData()?.userId?.let { userId ->
+                filesDataDao.getByPath(category, name)?.let { fileDbModel ->
+                    if (!fileDbModel.deleted) {
+                        FileModelMapper(fileHelper).mapFileModel(fileDbModel)
+                    } else {
+                        null
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     *  Blocking
+     */
+    fun createFile(createFileModel: CreateFileModel): FileModel? {
+        return filesLock.withLock {
+            authDataProvider.getAuthData()?.userId?.let { userId ->
+                val metadata = Metadata(userId, System.currentTimeMillis())
+                val mapper = FileMapper(fileHelper, metadata)
+                val currentDbModel = filesDataDao.getByPath(createFileModel.category, createFileModel.name)
+                val dbModel = mapper.mapNewOrUpdatedDbModel(createFileModel, currentDbModel)
+                filesDataDao.insert(dbModel)
+                getFile(dbModel.internalId)
+            }
+        }
+    }
+
+    /**
+     *  Blocking
+     */
+    fun removeFile(category: String, name: String) {
+        filesLock.withLock {
+            authDataProvider.getAuthData()?.userId?.let { userId ->
+                filesDataDao.getByPath(category, name)?.let { dbModel ->
+                    val metadata = Metadata(userId, System.currentTimeMillis())
+                    val mapper = FileMapper(fileHelper, metadata)
+                    filesDataDao.insert(mapper.getDeletedDbModel(dbModel))
+                }
+            }
+        }
+    }
+
+    /**
+     *  Blocking
+     */
+    fun syncFiles() {
+        if (filesSyncInProgress.get()) return
+
+        try {
+            filesSyncInProgress.set(true)
+            authDataProvider.getAuthData()?.userId?.let { userId ->
+                val metadata = Metadata(userId, System.currentTimeMillis())
+                syncFilesData(metadata)?.let {
+                    filesLock.withLock {
+                        executeLocalFilesUpdate(it)
+                    }
+                }
+            }
+        } finally {
+            filesSyncInProgress.set(false)
+        }
+    }
+
+    private fun syncFilesData(metadata: Metadata): List<FileUpdateModel>? {
+        return apiServiceProvider.getProfileFilesApi().listFiles().get()?.data?.let { inboundDtoList ->
+            val fileUpdateModels = mutableListOf<FileUpdateModel>()
+            val inboundDtoMap = inboundDtoList.associateBy { it.id }
+            val dbModels = filesDataDao.getUserFiles(metadata.userId)
+            val mapper = FileMapper(fileHelper, metadata)
+            dbModels.forEach { dbModel ->
+                if (dbModel.id == null) {
+                    if (dbModel.fileName != null) {
+                        val file = fileHelper.getFile(dbModel.fileName)
+                        if (!auxApi.putFileAsync(dbModel.category, dbModel.name, AuxApi.createFilePart(file)).execute().isSuccessful) {
+                            return null
+                        }
+                        apiServiceProvider.getProfileFilesApi().getCategoryFileByName(dbModel.category, dbModel.name).get()?.data?.let {
+                            val updatedDbModel = mapper.getUpdatedDbModel(dbModel, it)
+                            fileUpdateModels.add(FileUpdateModel(updatedDbModel, FileAction.NO_OP))
+                        }
+                    } else {
+                        fileUpdateModels.add(FileUpdateModel(dbModel, FileAction.DELETE))
+                    }
+                } else {
+                    val inboundDto = inboundDtoMap[dbModel.id]
+                    if (inboundDto != null) {
+                        if (!dataIsUpToDate(dbModel.modifiedAt, inboundDto.modifiedAt?.millis)) {
+                            if (dbModel.modifiedAt > inboundDto.modifiedAt?.millis ?: 0) {
+                                if (dbModel.deleted) {
+                                    if (!apiServiceProvider.getProfileFilesApi().deleteFile(dbModel.id).execute().isSuccessful) {
+                                        return null
+                                    }
+                                    fileUpdateModels.add(FileUpdateModel(dbModel, FileAction.DELETE))
+                                } else if (dbModel.fileName != null) {
+                                    val file = fileHelper.getFile(dbModel.fileName)
+                                    if (!auxApi.putFileAsync(dbModel.category, dbModel.name, AuxApi.createFilePart(file)).execute().isSuccessful) {
+                                        return null
+                                    }
+                                    apiServiceProvider.getProfileFilesApi().getCategoryFileByName(dbModel.category, dbModel.name).get()?.data?.let {
+                                        val updatedDbModel = mapper.getUpdatedDbModel(dbModel, it)
+                                        fileUpdateModels.add(FileUpdateModel(updatedDbModel, FileAction.NO_OP))
+                                    }
+                                }
+                            } else {
+                                //dl
+                                inboundDto.category?.let { category ->
+                                    try {
+                                        auxApi.getFileAsync(category, inboundDto.name).execute().body()?.let { file ->
+                                            val fileName = FileHelper.filename(category, inboundDto.name, true)
+                                            val bitmap: Bitmap? = BitmapFactory.decodeStream(file.byteStream())
+                                            if (bitmap != null) {
+                                                fileHelper.copyFromBitmap(bitmap, fileName)
+                                            } else {
+                                                fileHelper.copyFromResponse(file, fileName)
+                                            }
+                                            fileUpdateModels.add(FileUpdateModel(mapper.getUpdatedDbModel(null, inboundDto), FileAction.COPY_FROM_TMP))
+                                        }
+                                    } catch (e: IOException) {
+                                        e.printStackTrace()
+                                        return null
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        fileUpdateModels.add(FileUpdateModel(dbModel, FileAction.DELETE))
+                    }
+                }
+            }
+
+            val dbModelMap = dbModels.associateBy { it.id }
+            inboundDtoList
+                .filter { !dbModelMap.containsKey(it.id) }
+                .forEach { inboundDto ->
+                    //dl
+                    inboundDto.category?.let { category ->
+                        try {
+                            auxApi.getFileAsync(category, inboundDto.name).execute().body()?.let { file ->
+                                val fileName = FileHelper.filename(category, inboundDto.name, true)
+                                val bitmap: Bitmap? = BitmapFactory.decodeStream(file.byteStream())
+                                if (bitmap != null) {
+                                    fileHelper.copyFromBitmap(bitmap, fileName)
+                                } else {
+                                    fileHelper.copyFromResponse(file, fileName)
+                                }
+                                fileUpdateModels.add(FileUpdateModel(mapper.getUpdatedDbModel(null, inboundDto), FileAction.COPY_FROM_TMP))
+                            }
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                            return null
+                        }
+                    }
+                }
+            fileUpdateModels
+        }
+    }
+
+    private fun executeLocalFilesUpdate(fileUpdateModels: List<FileUpdateModel>) {
+        fileUpdateModels.forEach { fileUpdateModel ->
+            filesDataDao.insert(fileUpdateModel.dbModel)
+            if (fileUpdateModel.fileAction == FileAction.COPY_FROM_TMP) {
+                fileHelper.move(
+                    FileHelper.filename(fileUpdateModel.dbModel.category, fileUpdateModel.dbModel.name, true),
+                    FileHelper.filename(fileUpdateModel.dbModel.category, fileUpdateModel.dbModel.name)
+                )
+            } else if (fileUpdateModel.fileAction == FileAction.DELETE) {
+                filesDataDao.deleteByInternalId(fileUpdateModel.dbModel.internalId)
+                fileHelper.delete(FileHelper.filename(fileUpdateModel.dbModel.category, fileUpdateModel.dbModel.name))
+            }
+        }
+    }
+
+    /**
+     *  Blocking
+     */
     fun removeUserData() {
         profileLock.withLock {
             bankAccountsLock.withLock {
-                authDataProvider.getAuthData()?.userId?.let { userId ->
-                    profileDataDao.deleteProfileData()
-                    bankAccountDataDao.deleteAll()
-                    fileHelper.clearFiles()
+                filesLock.withLock {
+                    authDataProvider.getAuthData()?.userId?.let { userId ->
+                        profileDataDao.deleteProfileData()
+                        bankAccountDataDao.deleteAll()
+                        filesDataDao.deleteAll()
+                        fileHelper.clearFiles()
+                    }
                 }
             }
         }

@@ -2,12 +2,17 @@ package ru.breffi.storyid.profile
 
 import android.content.Context
 import android.graphics.Bitmap
+import okhttp3.ResponseBody
 import java.io.*
 
 
 internal class FileHelper(context: Context) {
 
     companion object {
+
+        fun filename(category: String, name: String, tmp: Boolean = false): String {
+            return "${prefix(tmp)}storyid_file_${category}_${name}.jpg"
+        }
 
         fun itnFilename(tmp: Boolean = false): String {
             return "${prefix(tmp)}storyid_itn.jpg"
@@ -62,6 +67,18 @@ internal class FileHelper(context: Context) {
 
         val fos = FileOutputStream(file)
         fos.write(bitmapData)
+        fos.flush()
+        fos.close()
+
+        return file
+    }
+
+    fun copyFromResponse(responseBody: ResponseBody, name: String): File {
+        val file = getFile(name)
+        file.createNewFile()
+
+        val fos = FileOutputStream(file)
+        fos.write(responseBody.bytes())
         fos.flush()
         fos.close()
 

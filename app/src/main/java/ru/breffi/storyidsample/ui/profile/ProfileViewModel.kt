@@ -13,7 +13,6 @@ import javax.inject.Inject
 
 class ProfileViewModel @Inject
 constructor(
-    private val fileRepository: FilesRepository,
     private val profileRepository: ProfileRepository,
     private val appAuthRepository: AppAuthRepository
 ) : ViewModel() {
@@ -32,7 +31,7 @@ constructor(
     private fun getAvatarImage() {
         viewModelScope.launch {
             try {
-                imageAvatar.postValue(fileRepository.getFileIfExists(AVATAR_IMAGE_FILE))
+                imageAvatar.postValue(profileRepository.getAvatar()?.file)
             } catch (t: Throwable) {
                 t.printStackTrace()
             }
@@ -40,11 +39,16 @@ constructor(
     }
 
     fun setAvatarImage(file: File) {
+        viewModelScope.launch {
+            profileRepository.setAvatar(file)
+        }
         imageAvatar.postValue(file)
     }
 
     fun deleteAvatarImage(fileName: String) {
-        fileRepository.delete(fileName)
+        viewModelScope.launch {
+            profileRepository.deleteAvatar()
+        }
         imageAvatar.postValue(null)
     }
 

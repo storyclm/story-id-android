@@ -1,6 +1,7 @@
 package ru.breffi.storyid.profile
 
 import android.webkit.MimeTypeMap
+import kotlinx.coroutines.Deferred
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -69,4 +70,11 @@ interface AuxApi {
 
     @DELETE("profile/itn/upload")
     fun deleteItnImageAsync(): Call<StoryITN>
+
+    @GET("profile/files/{category}/{name}/download")
+    fun getFileAsync(@Path("category") category: String, @Path("name") name: String): Call<ResponseBody>
+
+    @Multipart
+    @PUT("profile/files/{category}/{name}")
+    fun putFileAsync(@Path("category") category: String, @Path("name") name: String, @Part filePart: MultipartBody.Part): Call<Unit>
 }

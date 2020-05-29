@@ -61,7 +61,6 @@ constructor(
 
         if (authHandler.isAuthenticated()) {
             profileRepository.syncProfile()
-            errors += profileRepository.syncAvatarImage()
         }
 
         applicationContext.sendBroadcast(Intent(BROADCAST_ACTION))

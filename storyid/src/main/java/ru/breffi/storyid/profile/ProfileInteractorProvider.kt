@@ -17,6 +17,7 @@ class ProfileInteractorProvider(
     private val storyIdDatabase = StoryIdDatabase.build(context)
     private val profileDataDao = storyIdDatabase.profileDao()
     private val bankAccountsDataDao = storyIdDatabase.bankAccountDao()
+    private val filesDataDao = storyIdDatabase.filesDao()
 
     private lateinit var profileInteractor: ProfileInteractor
 
@@ -26,6 +27,7 @@ class ProfileInteractorProvider(
                 apiServiceProvider,
                 profileDataDao,
                 bankAccountsDataDao,
+                filesDataDao,
                 authDataProvider,
                 FileHelper(context)
             )
