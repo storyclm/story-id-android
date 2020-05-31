@@ -47,7 +47,7 @@ class ProfileFragment : ImageFragment() {
     }
 
     override fun onDeleteImage(fileName: String) {
-        viewModel.deleteAvatarImage(fileName)
+        viewModel.deleteAvatarImage()
     }
 
     override fun getTitle(context: Context, toolbarFreeWidth: Int): CharSequence {

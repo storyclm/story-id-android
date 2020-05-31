@@ -1,76 +1,70 @@
 package ru.breffi.storyidsample.repository
 
 import android.content.Context
-import android.graphics.BitmapFactory
-import android.webkit.MimeTypeMap
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import ru.breffi.storyidsample.api.ApiServiceId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import ru.breffi.storyid.profile.ProfileInteractor
 import ru.breffi.storyid.profile.model.CreateFileModel
 import ru.breffi.storyid.profile.model.FileModel
+import ru.breffi.storyid.profile.model.FilePathModel
 import ru.breffi.storyid.profile.model.ProfileModel
-import ru.breffi.storyidsample.utils.getApiErrorCode
-import ru.breffi.storyidsample.utils.isFull
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ProfileRepository @Inject
-constructor(
-    private val context: Context,
-//    private val profileDao: ProfileDao,
-    private val fileRepository: FilesRepository,
-    private val apiServiceId: ApiServiceId,
-    private val profileInteractor: ProfileInteractor
-) {
+constructor(profileInteractor: ProfileInteractor) {
 
-    /*ФИО*/
+    companion object {
+        private val avatarPath = FilePathModel("image", "avatar")
+    }
+
+    private val profileHandler = profileInteractor.profileHandler
+    private val fileHandler = profileInteractor.fileHandler
+
+    private val profileChannel = MutableLiveData<ProfileModel?>()
+    private val avatarFileChannel = MutableLiveData<FileModel?>()
+
     fun getProfile(): LiveData<ProfileModel?> {
-        return liveData {
-            val profile = withContext(Dispatchers.IO) {
-                profileInteractor.getProfile()
-            }
-            emit(profile)
-        }
+        return profileChannel
     }
 
     suspend fun saveProfile(profile: ProfileModel) {
         withContext(Dispatchers.IO) {
-            profileInteractor.updateProfile(profile)
+            profileHandler.updateProfile(profile)
         }
     }
 
     fun syncProfile() {
-        profileInteractor.syncProfile()
-        profileInteractor.syncFiles()
+        profileHandler.syncProfile()
+        profileChannel.postValue(profileHandler.getProfile())
     }
 
-    //
+    fun syncFiles() {
+        fileHandler.syncFiles()
+        avatarFileChannel.postValue(fileHandler.getFile(avatarPath))
+    }
 
     suspend fun setAvatar(file: File) {
         withContext(Dispatchers.IO) {
-            profileInteractor.createFile(CreateFileModel("image", "avatar", file))
-            profileInteractor.syncFiles()
+            fileHandler.createFile(CreateFileModel(avatarPath, file))
+            fileHandler.syncFiles()
         }
     }
 
-    suspend fun getAvatar(): FileModel? {
-        return withContext(Dispatchers.IO) {
-            profileInteractor.getFile("image", "avatar")
-        }
+    fun getAvatar(): LiveData<FileModel?> {
+        return avatarFileChannel
     }
 
     suspend fun deleteAvatar() {
         return withContext(Dispatchers.IO) {
-            profileInteractor.removeFile("image", "avatar")
-            profileInteractor.syncFiles()
+            fileHandler.removeFile(avatarPath)
+            fileHandler.syncFiles()
         }
     }
 }

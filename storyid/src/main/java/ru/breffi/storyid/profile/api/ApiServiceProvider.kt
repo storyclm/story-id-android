@@ -1,4 +1,4 @@
-package ru.breffi.storyid.profile
+package ru.breffi.storyid.profile.api
 
 import okhttp3.OkHttpClient
 import ru.breffi.storyid.generated_api.ApiClient

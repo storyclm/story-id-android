@@ -3,6 +3,7 @@ package ru.breffi.storyid.profile.db
 import androidx.room.*
 import ru.breffi.storyid.profile.db.dto.BankAccountDbModel
 import ru.breffi.storyid.profile.db.dto.FileDbModel
+import ru.breffi.storyid.profile.model.FilePathModel
 
 @Dao
 abstract class FilesDataDao {

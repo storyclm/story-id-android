@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ru.breffi.storyid.profile.model.FileModel
 import ru.breffi.storyidsample.repository.AppAuthRepository
 import ru.breffi.storyidsample.repository.FilesRepository
 import ru.breffi.storyidsample.repository.ProfileRepository
@@ -15,27 +16,14 @@ class ProfileViewModel @Inject
 constructor(
     private val profileRepository: ProfileRepository,
     private val appAuthRepository: AppAuthRepository
-) : ViewModel() {
+) : ViewModel(), Observer<FileModel?> {
 
     val imageAvatar = MutableLiveData<File>()
-
-    private val start = MutableLiveData<Long>()
 
     val profile = profileRepository.getProfile()
 
     fun startLoading() {
-        start.postValue(0L)
-        getAvatarImage()
-    }
-
-    private fun getAvatarImage() {
-        viewModelScope.launch {
-            try {
-                imageAvatar.postValue(profileRepository.getAvatar()?.file)
-            } catch (t: Throwable) {
-                t.printStackTrace()
-            }
-        }
+        profileRepository.getAvatar().observeForever(this)
     }
 
     fun setAvatarImage(file: File) {
@@ -45,7 +33,7 @@ constructor(
         imageAvatar.postValue(file)
     }
 
-    fun deleteAvatarImage(fileName: String) {
+    fun deleteAvatarImage() {
         viewModelScope.launch {
             profileRepository.deleteAvatar()
         }
@@ -55,6 +43,17 @@ constructor(
     fun logout() {
         CoroutineScope(Dispatchers.IO).launch {
             appAuthRepository.clearUserData()
+        }
+    }
+
+    override fun onCleared() {
+        profileRepository.getAvatar().removeObserver(this)
+        super.onCleared()
+    }
+
+    override fun onChanged(fileModel: FileModel?) {
+        fileModel?.file?.let {
+            imageAvatar.postValue(it)
         }
     }
 }

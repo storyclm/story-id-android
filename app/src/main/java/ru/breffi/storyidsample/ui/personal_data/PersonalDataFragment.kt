@@ -8,30 +8,20 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
-import kotlinx.android.synthetic.main.fragment_itn.*
 import kotlinx.android.synthetic.main.fragment_personal_data.*
 import kotlinx.android.synthetic.main.fragment_personal_data.buttonSave
 import kotlinx.android.synthetic.main.static_hint_edittext.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.common.BasePageInjectableFragment
 import ru.breffi.storyidsample.ui.common.model.ChangeState
-import ru.breffi.storyidsample.ui.itn.ItnFragment
 import ru.breffi.storyidsample.utils.applyMask
 import ru.breffi.storyidsample.utils.setButtonEnabled
 import ru.breffi.storyidsample.utils.validateEmail
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 
-class PersonalDataFragment : BasePageInjectableFragment(), CoroutineScope {
-
-    private lateinit var mJob: Job
-    override val coroutineContext: CoroutineContext
-        get() = mJob + Dispatchers.Main
+class PersonalDataFragment : BasePageInjectableFragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -43,8 +33,7 @@ class PersonalDataFragment : BasePageInjectableFragment(), CoroutineScope {
     companion object {
 
         fun newInstance(): PersonalDataFragment {
-            val fragment = PersonalDataFragment()
-            return fragment
+            return PersonalDataFragment()
         }
 
     }
@@ -55,11 +44,6 @@ class PersonalDataFragment : BasePageInjectableFragment(), CoroutineScope {
 
     override fun getLayoutResId(): Int {
         return R.layout.fragment_personal_data
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mJob = Job()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -101,7 +85,7 @@ class PersonalDataFragment : BasePageInjectableFragment(), CoroutineScope {
 
             val mail = email.getText().trim()
             if (mail.validateEmail()) {
-                profile = profile?.copy(email = mail, emailVerified = false)
+                profile = profile?.copy(email = if (mail.isEmpty()) null else mail, emailVerified = false)
 
                 email.wasChanged = false
             }
@@ -120,11 +104,10 @@ class PersonalDataFragment : BasePageInjectableFragment(), CoroutineScope {
         super.onActivityCreated(savedInstanceState)
 
         viewModel.profile.observe(viewLifecycleOwner) { handleProfileResource(it) }
-        viewModel.start()
     }
 
     private fun handleProfileResource(profile: ProfileModel?) {
-        if (profile != null) {
+        if (profile != null && profile != this.profile) {
             this.profile = profile
 
             phone.setText(profile.phone)
@@ -155,11 +138,6 @@ class PersonalDataFragment : BasePageInjectableFragment(), CoroutineScope {
         patronymic.text.addTextChangedListener {
             changeState.itemChanged("patronymic", it.toString() != profileDemographics.patronymic)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mJob.cancel()
     }
 }
 

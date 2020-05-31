@@ -19,11 +19,7 @@ constructor(
 ) : ViewModel() {
 
     val start = MutableLiveData<Long>()
-    val profile = start.switchMap { profileRepository.getProfile() }
-
-    fun start() {
-        start.postValue(0L)
-    }
+    val profile = profileRepository.getProfile()
 
     fun saveProfile(profile: ProfileModel?) {
         viewModelScope.launch {

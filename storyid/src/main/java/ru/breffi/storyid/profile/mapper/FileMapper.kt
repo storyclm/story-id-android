@@ -1,30 +1,25 @@
 package ru.breffi.storyid.profile.mapper
 
 import ru.breffi.storyid.generated_api.model.FileViewModel
-import ru.breffi.storyid.generated_api.model.StoryBankAccount
-import ru.breffi.storyid.generated_api.model.StoryBankAccountDTO
-import ru.breffi.storyid.profile.FileHelper
-import ru.breffi.storyid.profile.db.dto.BankAccountDbModel
+import ru.breffi.storyid.profile.util.FileHelper
 import ru.breffi.storyid.profile.db.dto.FileDbModel
-import ru.breffi.storyid.profile.model.BankAccountModel
-import ru.breffi.storyid.profile.model.CreateBankAccountModel
 import ru.breffi.storyid.profile.model.CreateFileModel
 import ru.breffi.storyid.profile.model.internal.Metadata
-import ru.breffi.storyid.profile.newId
-import java.io.File
+import ru.breffi.storyid.profile.util.newId
 
 internal class FileMapper(private val fileHelper: FileHelper, private val metadata: Metadata) {
 
     fun mapNewOrUpdatedDbModel(createModel: CreateFileModel, dbModel: FileDbModel?): FileDbModel {
         //todo update metadata
-        val fileName = FileHelper.filename(createModel.category, createModel.name)
+        val path = createModel.path
+        val fileName = FileHelper.filename(path.category, path.name)
         fileHelper.copy(createModel.file, fileName)
         return dbModel?.copy(
             modifiedAt = metadata.timestamp
         ) ?: FileDbModel(
             internalId = newId(),
-            category = createModel.category,
-            name = createModel.name,
+            category = path.category,
+            name = path.name,
             createdAt = metadata.timestamp,
             modifiedAt = metadata.timestamp,
             fileName = fileName,

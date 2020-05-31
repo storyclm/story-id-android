@@ -1,7 +1,6 @@
-package ru.breffi.storyid.profile
+package ru.breffi.storyid.profile.api
 
 import android.webkit.MimeTypeMap
-import kotlinx.coroutines.Deferred
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

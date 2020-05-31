@@ -14,6 +14,7 @@ import dagger.android.HasServiceInjector
 import ru.breffi.storyidsample.di.DaggerAppComponent
 import ru.breffi.storyidsample.di.StoryIdWorkerFactory
 import ru.breffi.storyidsample.repository.work.BankAccountsSyncWorker
+import ru.breffi.storyidsample.repository.work.FilesSyncWorker
 import ru.breffi.storyidsample.ui.common.glide.GlideFileLoader
 import ru.breffi.storyidsample.repository.work.ProfileSyncWorker
 import javax.inject.Inject
@@ -41,6 +42,7 @@ class Application : Application(), HasActivityInjector, HasServiceInjector, HasB
             override fun onBecameForeground() {
                 ProfileSyncWorker.start(applicationContext)
                 BankAccountsSyncWorker.start(applicationContext)
+                FilesSyncWorker.start(applicationContext)
             }
 
             override fun onBecameBackground() {}
@@ -75,6 +77,8 @@ class Application : Application(), HasActivityInjector, HasServiceInjector, HasB
 
     override fun onTerminate() {
         ProfileSyncWorker.cancel(applicationContext)
+        BankAccountsSyncWorker.cancel(applicationContext)
+        FilesSyncWorker.cancel(applicationContext)
 
         super.onTerminate()
     }

@@ -6,7 +6,7 @@ import ru.breffi.storyid.profile.db.dto.BankAccountDbModel
 import ru.breffi.storyid.profile.model.BankAccountModel
 import ru.breffi.storyid.profile.model.CreateBankAccountModel
 import ru.breffi.storyid.profile.model.internal.Metadata
-import ru.breffi.storyid.profile.newId
+import ru.breffi.storyid.profile.util.newId
 
 internal class BankAccountMapper(private val metadata: Metadata) {
 

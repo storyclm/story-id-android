@@ -1,6 +1,6 @@
 package ru.breffi.storyid.profile.mapper
 
-import ru.breffi.storyid.profile.FileHelper
+import ru.breffi.storyid.profile.util.FileHelper
 import ru.breffi.storyid.profile.db.dto.FileDbModel
 import ru.breffi.storyid.profile.model.FileModel
 

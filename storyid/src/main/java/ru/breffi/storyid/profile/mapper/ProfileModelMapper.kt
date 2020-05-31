@@ -1,10 +1,10 @@
 package ru.breffi.storyid.profile.mapper
 
-import ru.breffi.storyid.profile.FileHelper
+import ru.breffi.storyid.profile.util.FileHelper
 import ru.breffi.storyid.profile.db.dto.*
 import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyid.profile.model.internal.Metadata
-import ru.breffi.storyid.profile.newId
+import ru.breffi.storyid.profile.util.newId
 import java.io.File
 
 internal class ProfileModelMapper(private val metadata: Metadata, private val fileHelper: FileHelper) {

@@ -1,4 +1,4 @@
-package ru.breffi.storyid.profile
+package ru.breffi.storyid.profile.util
 
 import android.content.Context
 import android.graphics.Bitmap

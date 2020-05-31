@@ -13,13 +13,15 @@ import javax.inject.Singleton
 
 @Singleton
 class BankAccountRepository @Inject
-internal constructor(private val profileInteractor: ProfileInteractor) {
+internal constructor(profileInteractor: ProfileInteractor) {
+
+    private val bankAccountsHandler = profileInteractor.bankAccountsHandler
 
     fun getBankAccounts(): LiveData<Resource<List<BankAccountModel>>> {
         return liveData {
             emit(Resource.loading<List<BankAccountModel>>(null))
             val bankAccounts = withContext(Dispatchers.IO) {
-                profileInteractor.getBankAccounts()
+                bankAccountsHandler.getBankAccounts()
             }
             emit(Resource.success(bankAccounts))
         }
@@ -28,7 +30,7 @@ internal constructor(private val profileInteractor: ProfileInteractor) {
     fun getBankAccountLiveData(id: String): LiveData<BankAccountModel?> {
         return liveData {
             val bankAccount = withContext(Dispatchers.IO) {
-                profileInteractor.getBankAccount(id)
+                bankAccountsHandler.getBankAccount(id)
             }
             emit(bankAccount)
         }
@@ -36,14 +38,14 @@ internal constructor(private val profileInteractor: ProfileInteractor) {
 
     suspend fun getBankAccount(id: String): BankAccountModel? {
         return withContext(Dispatchers.IO) {
-            profileInteractor.getBankAccount(id)
+            bankAccountsHandler.getBankAccount(id)
         }
     }
 
     fun createBankAccount(createBankAccount: CreateBankAccountModel): LiveData<Resource<BankAccountModel>> {
         return liveData {
             val bankAccount = withContext(Dispatchers.IO) {
-                profileInteractor.createBankAccount(createBankAccount)
+                bankAccountsHandler.createBankAccount(createBankAccount)
             }
             if (bankAccount != null) {
                 emit(Resource.success(bankAccount))
@@ -56,13 +58,13 @@ internal constructor(private val profileInteractor: ProfileInteractor) {
     fun changeBankAccount(bankAccount: BankAccountModel): LiveData<Resource<BankAccountModel>> {
         return liveData {
             withContext(Dispatchers.IO) {
-                profileInteractor.updateBankAccount(bankAccount)
+                bankAccountsHandler.updateBankAccount(bankAccount)
             }
             emit(Resource.success(bankAccount))
         }
     }
 
     fun syncBankAccounts() {
-        profileInteractor.syncBankAccounts()
+        bankAccountsHandler.syncBankAccounts()
     }
 }
