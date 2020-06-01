@@ -10,12 +10,13 @@ import ru.breffi.storyid.profile.util.newId
 internal class FileMapper(private val fileHelper: FileHelper, private val metadata: Metadata) {
 
     fun mapNewOrUpdatedDbModel(createModel: CreateFileModel, dbModel: FileDbModel?): FileDbModel {
-        //todo update metadata
         val path = createModel.path
         val fileName = FileHelper.filename(path.category, path.name)
         fileHelper.copy(createModel.file, fileName)
+        val mimeType = FileHelper.getMimeType(createModel.file)
         return dbModel?.copy(
-            modifiedAt = metadata.timestamp
+            modifiedAt = metadata.timestamp,
+            mimeType = mimeType
         ) ?: FileDbModel(
             internalId = newId(),
             category = path.category,
@@ -23,7 +24,8 @@ internal class FileMapper(private val fileHelper: FileHelper, private val metada
             createdAt = metadata.timestamp,
             modifiedAt = metadata.timestamp,
             fileName = fileName,
-            userId = metadata.userId
+            userId = metadata.userId,
+            mimeType = mimeType
         )
     }
 
