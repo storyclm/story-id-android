@@ -211,14 +211,15 @@ class FileHandler internal constructor(
     private fun executeLocalFilesUpdate(fileUpdateModels: List<FileUpdateModel>) {
         fileUpdateModels.forEach { fileUpdateModel ->
             filesDataDao.insert(fileUpdateModel.dbModel)
+            val fileName = fileUpdateModel.dbModel.fileName ?: FileHelper.filename(fileUpdateModel.dbModel.category, fileUpdateModel.dbModel.name)
             if (fileUpdateModel.fileAction == FileAction.COPY_FROM_TMP) {
                 fileHelper.move(
                     FileHelper.filename(fileUpdateModel.dbModel.category, fileUpdateModel.dbModel.name, true),
-                    FileHelper.filename(fileUpdateModel.dbModel.category, fileUpdateModel.dbModel.name)
+                    fileName
                 )
             } else if (fileUpdateModel.fileAction == FileAction.DELETE) {
                 filesDataDao.deleteByInternalId(fileUpdateModel.dbModel.internalId)
-                fileHelper.delete(FileHelper.filename(fileUpdateModel.dbModel.category, fileUpdateModel.dbModel.name))
+                fileHelper.delete(fileName)
             }
         }
     }

@@ -1,5 +1,6 @@
 package ru.breffi.storyid.profile.mapper
 
+import android.webkit.MimeTypeMap
 import ru.breffi.storyid.generated_api.model.FileViewModel
 import ru.breffi.storyid.profile.util.FileHelper
 import ru.breffi.storyid.profile.db.dto.FileDbModel
@@ -11,7 +12,8 @@ internal class FileMapper(private val fileHelper: FileHelper, private val metada
 
     fun mapNewOrUpdatedDbModel(createModel: CreateFileModel, dbModel: FileDbModel?): FileDbModel {
         val path = createModel.path
-        val fileName = FileHelper.filename(path.category, path.name)
+        val extension = MimeTypeMap.getFileExtensionFromUrl(createModel.file.toString())
+        val fileName = FileHelper.filename(path.category, "${path.name}.$extension")
         fileHelper.copy(createModel.file, fileName)
         val mimeType = FileHelper.getMimeType(createModel.file)
         return dbModel?.copy(

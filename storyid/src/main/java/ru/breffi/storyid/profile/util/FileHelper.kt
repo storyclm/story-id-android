@@ -15,7 +15,7 @@ internal class FileHelper(context: Context) {
     companion object {
 
         fun filename(category: String, name: String, tmp: Boolean = false): String {
-            return "${prefix(tmp)}storyid_file_${category}_${name}.jpg"
+            return "${prefix(tmp)}storyid_file_${category}_${name}"
         }
 
         fun itnFilename(tmp: Boolean = false): String {
