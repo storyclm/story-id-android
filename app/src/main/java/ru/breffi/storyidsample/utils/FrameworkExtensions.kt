@@ -10,3 +10,7 @@ fun Button.setButtonEnabled(enabled: Boolean) {
     }
     isEnabled = enabled
 }
+
+fun <T> T?.orNull(): T? where T : CharSequence {
+    return if (this.isNullOrEmpty()) null else this
+}

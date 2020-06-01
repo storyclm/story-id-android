@@ -1,4 +1,4 @@
-package ru.breffi.storyidsample.utils
+package ru.breffi.storyidsample.ui.common
 
 import android.Manifest
 import android.app.Activity
@@ -14,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.breffi.storyidsample.BuildConfig
 import ru.breffi.storyidsample.R
-import ru.breffi.storyidsample.ui.common.BasePageInjectableFragment
 import ru.breffi.storyidsample.repository.FilesRepository
 import ru.breffi.storyidsample.ui.image_preview.ImagePreviewActivity
 import java.io.File

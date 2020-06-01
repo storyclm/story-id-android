@@ -16,6 +16,7 @@ import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.common.BasePageInjectableFragment
 import ru.breffi.storyidsample.ui.common.model.ChangeState
 import ru.breffi.storyidsample.utils.applyMask
+import ru.breffi.storyidsample.utils.orNull
 import ru.breffi.storyidsample.utils.setButtonEnabled
 import ru.breffi.storyidsample.utils.validateEmail
 import javax.inject.Inject
@@ -85,7 +86,7 @@ class PersonalDataFragment : BasePageInjectableFragment() {
 
             val mail = email.getText().trim()
             if (mail.validateEmail()) {
-                profile = profile?.copy(email = if (mail.isEmpty()) null else mail, emailVerified = false)
+                profile = profile?.copy(email = mail.orNull(), emailVerified = false)
 
                 email.wasChanged = false
             }
@@ -103,25 +104,23 @@ class PersonalDataFragment : BasePageInjectableFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        viewModel.profile.observe(viewLifecycleOwner) { handleProfileResource(it) }
+        viewModel.profile.observeFirstNonNull(viewLifecycleOwner) { handleProfileResource(it) }
     }
 
-    private fun handleProfileResource(profile: ProfileModel?) {
-        if (profile != null && profile != this.profile) {
-            this.profile = profile
+    private fun handleProfileResource(profile: ProfileModel) {
+        this.profile = profile
 
-            phone.setText(profile.phone)
-            email.setText(profile.email)
+        phone.setText(profile.phone)
+        email.setText(profile.email)
 
-            phone.text.addTextChangedListener {
-                changeState.itemChanged("phone", it.toString() != profile.phone)
-            }
-            email.text.addTextChangedListener {
-                changeState.itemChanged("email", it.toString() != profile.email)
-            }
-
-            handleProfileDemographicsResource(profile.demographics)
+        phone.text.addTextChangedListener {
+            changeState.itemChanged("phone", it.toString() != profile.phone)
         }
+        email.text.addTextChangedListener {
+            changeState.itemChanged("email", it.toString() != profile.email)
+        }
+
+        handleProfileDemographicsResource(profile.demographics)
     }
 
     private fun handleProfileDemographicsResource(profileDemographics: DemographicsModel) {

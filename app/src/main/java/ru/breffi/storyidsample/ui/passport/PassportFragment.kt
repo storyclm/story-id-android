@@ -13,23 +13,18 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import kotlinx.android.synthetic.main.fragment_itn.*
 import kotlinx.android.synthetic.main.fragment_itn.buttonSave
 import kotlinx.android.synthetic.main.fragment_passport.*
-import kotlinx.android.synthetic.main.fragment_profile.*
-import kotlinx.android.synthetic.main.fragment_profile.passport
-import kotlinx.android.synthetic.main.fragment_profile.view.*
 import kotlinx.android.synthetic.main.layout_doc_image.view.*
 import kotlinx.android.synthetic.main.static_hint_edittext.view.*
 import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.common.glide.GlideApp
 import ru.breffi.storyidsample.ui.common.model.ChangeState
-import ru.breffi.storyidsample.ui.image_preview.ImagePreviewActivity
-import ru.breffi.storyidsample.ui.itn.ItnFragment
 import ru.breffi.storyidsample.ui.passport.model.PassportPage
-import ru.breffi.storyidsample.utils.ImageFragment
+import ru.breffi.storyidsample.ui.common.ImageFragment
 import ru.breffi.storyidsample.utils.applyMask
+import ru.breffi.storyidsample.utils.orNull
 import ru.breffi.storyidsample.utils.setButtonEnabled
 import java.io.File
 import javax.inject.Inject
@@ -72,10 +67,6 @@ class PassportFragment : ImageFragment() {
         return R.layout.fragment_passport
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -90,7 +81,7 @@ class PassportFragment : ImageFragment() {
 
         buttonSave.setOnClickListener {
             profile = profile?.let {
-                val passportModel = it.passport.copy(sn = tvPassport.getText())
+                val passportModel = it.passport.copy(sn = tvPassport.getText().orNull())
                 val map = viewModel.passportPageImages.value ?: mutableMapOf()
                 val pages = passportModel.pages.map { pageModel -> pageModel.copy(file = map[pageModel.page]?.imageFile) }
                 it.copy(passport = passportModel.copy(pages = pages))
@@ -109,9 +100,9 @@ class PassportFragment : ImageFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        viewModel.profile.observe(viewLifecycleOwner) { profileModel ->
+        viewModel.profile.observeFirstNonNull(viewLifecycleOwner) { profileModel ->
             profile = profileModel
-            profileModel?.let { handleProfilePassport(it.passport) }
+            handleProfilePassport(profileModel.passport)
         }
 
         viewModel.passportPageImages.observe(viewLifecycleOwner) { files ->
@@ -123,8 +114,6 @@ class PassportFragment : ImageFragment() {
                 }
             }
         }
-
-        viewModel.start()
     }
 
     private fun setPassportFiles(passportPages: MutableMap<Int, PassportPage>) {

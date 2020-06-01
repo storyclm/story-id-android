@@ -18,7 +18,7 @@ import ru.breffi.storyidsample.ui.itn.ItnFragment
 import ru.breffi.storyidsample.ui.passport.PassportFragment
 import ru.breffi.storyidsample.ui.personal_data.PersonalDataFragment
 import ru.breffi.storyidsample.ui.snils.SnilsFragment
-import ru.breffi.storyidsample.utils.ImageFragment
+import ru.breffi.storyidsample.ui.common.ImageFragment
 
 import java.io.File
 import javax.inject.Inject

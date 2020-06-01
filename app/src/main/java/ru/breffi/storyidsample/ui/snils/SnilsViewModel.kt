@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import ru.breffi.storyid.profile.model.ProfileModel
 import ru.breffi.storyidsample.repository.ProfileRepository
 import ru.breffi.storyidsample.repository.work.ProfileSyncWorker
+import ru.breffi.storyidsample.ui.common.LiveDataWrapper
 import java.io.File
 import javax.inject.Inject
 
@@ -19,17 +20,9 @@ constructor(
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
-    val start = MutableLiveData<Long>()
-
     val imageSnils = MutableLiveData<File?>()
 
-    private var imageSnilsWasChanged = false
-
-    val profile = start.switchMap { profileRepository.getProfile() }
-
-    fun start() {
-        start.postValue(0L)
-    }
+    val profile = LiveDataWrapper(profileRepository.getProfile())
 
     fun saveProfile(profile: ProfileModel?) {
         viewModelScope.launch {
@@ -42,11 +35,9 @@ constructor(
 
     fun setSnilsImage(file: File) {
         imageSnils.postValue(file)
-        imageSnilsWasChanged = true
     }
 
     fun deleteImage() {
         imageSnils.postValue(null)
-        imageSnilsWasChanged = true
     }
 }

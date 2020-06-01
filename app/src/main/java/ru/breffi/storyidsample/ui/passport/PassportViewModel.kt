@@ -10,6 +10,7 @@ import ru.breffi.storyid.profile.model.PassportPageModel
 import ru.breffi.storyid.profile.model.ProfileModel
 import ru.breffi.storyidsample.repository.ProfileRepository
 import ru.breffi.storyidsample.repository.work.ProfileSyncWorker
+import ru.breffi.storyidsample.ui.common.LiveDataWrapper
 import ru.breffi.storyidsample.ui.passport.model.PassportPage
 import java.io.File
 import javax.inject.Inject
@@ -21,15 +22,9 @@ constructor(
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
-    val start = MutableLiveData<Long>()
-
     val passportPageImages = MutableLiveData<MutableMap<Int, PassportPage>>(mutableMapOf())
 
-    val profile = start.switchMap { profileRepository.getProfile() }
-
-    fun start() {
-        start.postValue(0L)
-    }
+    val profile = LiveDataWrapper(profileRepository.getProfile())
 
     fun saveProfile(profile: ProfileModel?) {
         viewModelScope.launch {
