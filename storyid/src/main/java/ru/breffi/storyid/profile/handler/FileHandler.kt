@@ -140,8 +140,7 @@ class FileHandler internal constructor(
             dbModels.forEach { dbModel ->
                 if (dbModel.id == null) {
                     if (dbModel.fileName != null) {
-                        val file = fileHelper.getFile(dbModel.fileName)
-                        if (!auxApi.putFileAsync(dbModel.category, dbModel.name, AuxApi.createFilePart(file)).execute().isSuccessful) {
+                        if (!auxApi.putFileAsync(dbModel.category, dbModel.name, fileHelper.getFilePart(dbModel.fileName)).execute().isSuccessful) {
                             return null
                         }
                         apiServiceProvider.getProfileFilesApi().getCategoryFileByName(dbModel.category, dbModel.name).get()?.data?.let {
@@ -162,8 +161,7 @@ class FileHandler internal constructor(
                                     }
                                     fileUpdateModels.add(FileUpdateModel(dbModel, FileAction.DELETE))
                                 } else if (dbModel.fileName != null) {
-                                    val file = fileHelper.getFile(dbModel.fileName)
-                                    if (!auxApi.putFileAsync(dbModel.category, dbModel.name, AuxApi.createFilePart(file)).execute().isSuccessful) {
+                                    if (!auxApi.putFileAsync(dbModel.category, dbModel.name, fileHelper.getFilePart(dbModel.fileName)).execute().isSuccessful) {
                                         return null
                                     }
                                     apiServiceProvider.getProfileFilesApi().getCategoryFileByName(dbModel.category, dbModel.name).get()?.data?.let {

@@ -2,8 +2,12 @@ package ru.breffi.storyid.profile.util
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.webkit.MimeTypeMap
+import okhttp3.MultipartBody
 import okhttp3.ResponseBody
+import ru.breffi.storyid.profile.api.AuxApi
 import java.io.*
+import java.util.*
 
 
 internal class FileHelper(context: Context) {
@@ -28,6 +32,19 @@ internal class FileHelper(context: Context) {
 
         private fun prefix(tmp: Boolean = false): String {
             return if (tmp) "_" else ""
+        }
+
+        fun getMimeType(file: File): String {
+            var type: String? = null
+            val url = file.toString()
+            val extension = MimeTypeMap.getFileExtensionFromUrl(url)
+            if (extension != null) {
+                type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase(Locale.US))
+            }
+            if (type == null) {
+                type = "*/*" // fallback type
+            }
+            return type
         }
     }
 
@@ -129,5 +146,10 @@ internal class FileHelper(context: Context) {
 
             }
         }
+    }
+
+    fun getFilePart(name: String): MultipartBody.Part {
+        val file = getFile(name)
+        return AuxApi.createFilePart(file, getMimeType(file))
     }
 }

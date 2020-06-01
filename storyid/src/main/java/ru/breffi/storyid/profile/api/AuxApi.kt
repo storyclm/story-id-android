@@ -16,25 +16,12 @@ import java.util.*
 interface AuxApi {
 
     companion object {
-        fun createFilePart(file: File): MultipartBody.Part {
+        fun createFilePart(file: File, mimeType: String): MultipartBody.Part {
             return MultipartBody.Part.createFormData(
                 "file",
                 file.name,
-                RequestBody.create(MediaType.parse(getMimeType(file)), file)
+                RequestBody.create(MediaType.parse(mimeType), file)
             )
-        }
-
-        private fun getMimeType(file: File): String {
-            var type: String? = null
-            val url = file.toString()
-            val extension = MimeTypeMap.getFileExtensionFromUrl(url)
-            if (extension != null) {
-                type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase(Locale.US))
-            }
-            if (type == null) {
-                type = "image/*" // fallback type. You might set it to */*
-            }
-            return type
         }
     }
 

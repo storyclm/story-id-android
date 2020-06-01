@@ -256,8 +256,7 @@ class ProfileHandler internal constructor(
                 outboundDto.itn = dbModel.itn
                 return apiServiceProvider.getProfileItnApi().setItn(outboundDto).get()?.data?.let {
                     if (dbModel.fileName != null) {
-                        val file = fileHelper.getFile(dbModel.fileName)
-                        if (!auxApi.putItnImageAsync(AuxApi.createFilePart(file)).execute().isSuccessful) {
+                        if (!auxApi.putItnImageAsync(fileHelper.getFilePart(dbModel.fileName)).execute().isSuccessful) {
                             return null
                         }
                     } else {
@@ -318,8 +317,7 @@ class ProfileHandler internal constructor(
                 outboundDto.snils = dbModel.snils
                 return apiServiceProvider.getProfileSnilsApi().setSnils(outboundDto).get()?.data?.let {
                     if (dbModel.fileName != null) {
-                        val file = fileHelper.getFile(dbModel.fileName)
-                        if (!auxApi.putSnilsImageAsync(AuxApi.createFilePart(file)).execute().isSuccessful) {
+                        if (!auxApi.putSnilsImageAsync(fileHelper.getFilePart(dbModel.fileName)).execute().isSuccessful) {
                             return null
                         }
                     } else {
@@ -392,8 +390,7 @@ class ProfileHandler internal constructor(
                 return apiServiceProvider.getProfilePassportApi().setPasport(outboundDto).get()?.data?.let { setResultDto ->
                     pageDbModels.forEach { pageDbModel ->
                         if (pageDbModel.fileName != null) {
-                            val file = fileHelper.getFile(pageDbModel.fileName)
-                            if (!auxApi.putPassportImageAsync(pageDbModel.page, AuxApi.createFilePart(file)).execute().isSuccessful) {
+                            if (!auxApi.putPassportImageAsync(pageDbModel.page, fileHelper.getFilePart(pageDbModel.fileName)).execute().isSuccessful) {
                                 return null
                             }
                         } else {
