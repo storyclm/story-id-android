@@ -3,6 +3,7 @@ package ru.breffi.storyidsample.ui.pin_code
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -59,8 +60,8 @@ class PinCodeActivity : BaseInjectableActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pin_code)
-        toolbar_title.text = getString(R.string.label_set_pin)
         mode = intent.getStringExtra(ARGS_MODE)
+        toolbar_title.text = if (mode == MODE_CHECK) getString(R.string.label_enter_pin) else getString(R.string.label_set_pin)
         fromSettings = intent.getBooleanExtra(ARGS_FROM_SETTINGS, false)
 
         if (mode == MODE_CHECK) {
@@ -70,7 +71,7 @@ class PinCodeActivity : BaseInjectableActivity() {
             if (fromSettings) {
                 forgetPin.text = getString(R.string.label_cancel)
             } else {
-                forgetPin.text = getString(R.string.label_skip)
+                forgetPin.visibility = View.GONE
             }
             putCodeLabel.text = getString(R.string.text_set_pin)
         }

@@ -175,10 +175,7 @@ class ConfirmCodeActivity : BaseInjectableActivity() {
                     hideKeyboard()
 
                     val intent = Intent()
-                    intent.putExtra(
-                        ARGS_NEXT_SCREEN,
-                        ARG_SCREEN_PIN
-                    )
+                    intent.putExtra(ARGS_NEXT_SCREEN, ARG_SCREEN_PIN)
                     setResult(Activity.RESULT_OK, intent)
                     finish()
                 }

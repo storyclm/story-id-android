@@ -13,12 +13,16 @@
     <string name="label_delete">Удалить</string>
     <string name="label_skip">Пропустить</string>
     <string name="label_set_pin">Установить пин-код</string>
+    <string name="label_enter_pin">Ввести пин-код</string>
 
     <string name="text_sms_repeat">Повторить смс</string>
     <string name="text_put_pin">Введите код</string>
     <string name="text_put_pin_again">Повторите код</string>
     <string name="text_double_exit_tap">Чтобы выйти нажмите "Назад" еще раз!</string>
     <string name="text_set_pin">Установите ПИН-код</string>
+
+    <string name="dialog_set_pin">Установить ПИН-код?</string>
+    <string name="dialog_set_pin_skip">Пропустить</string>
 
     <string name="error_io_label">Ошибка</string>
     <string name="error_io_text">Ошибка</string>
