@@ -1,7 +1,9 @@
 package ru.breffi.storyid.profile.util
 
 import retrofit2.Call
+import retrofit2.Response
 import ru.breffi.storyid.profile.model.internal.ApiResult
+import java.io.IOException
 import java.util.*
 import java.util.concurrent.locks.Lock
 
@@ -18,6 +20,17 @@ internal fun <T> Call<T>.get(): ApiResult<T>? {
             null
         }
     }
+}
+
+@Throws(IOException::class)
+internal fun <T> Call<T>.execute(retryCount: Int): Response<T> {
+    var response: Response<T>
+    var i = 0
+    do {
+        response = clone().execute()
+        i++
+    } while (!response.isSuccessful && i <= retryCount)
+    return response
 }
 
 internal fun newId(): String {

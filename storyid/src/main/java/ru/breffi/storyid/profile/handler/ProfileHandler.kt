@@ -19,6 +19,7 @@ import ru.breffi.storyid.profile.mapper.ProfileDtoMapper
 import ru.breffi.storyid.profile.mapper.ProfileModelMapper
 import ru.breffi.storyid.profile.model.ProfileModel
 import ru.breffi.storyid.profile.model.internal.*
+import ru.breffi.storyid.profile.util.execute
 import ru.breffi.storyid.profile.util.get
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
@@ -260,7 +261,7 @@ class ProfileHandler internal constructor(
                 outboundDto.itn = dbModel.itn
                 return apiServiceProvider.getProfileItnApi().setItn(outboundDto).get()?.data?.let {
                     if (dbModel.fileName != null) {
-                        if (!auxApi.putItnImageAsync(fileHelper.getFilePart(dbModel.fileName)).execute().isSuccessful) {
+                        if (!auxApi.putItnImageAsync(fileHelper.getFilePart(dbModel.fileName)).execute(1).isSuccessful) {
                             return null
                         }
                     } else {
@@ -321,7 +322,7 @@ class ProfileHandler internal constructor(
                 outboundDto.snils = dbModel.snils
                 return apiServiceProvider.getProfileSnilsApi().setSnils(outboundDto).get()?.data?.let {
                     if (dbModel.fileName != null) {
-                        if (!auxApi.putSnilsImageAsync(fileHelper.getFilePart(dbModel.fileName)).execute().isSuccessful) {
+                        if (!auxApi.putSnilsImageAsync(fileHelper.getFilePart(dbModel.fileName)).execute(1).isSuccessful) {
                             return null
                         }
                     } else {
@@ -392,7 +393,7 @@ class ProfileHandler internal constructor(
                 return apiServiceProvider.getProfilePassportApi().setPasport(outboundDto).get()?.data?.let { setResultDto ->
                     pageDbModels.forEach { pageDbModel ->
                         if (pageDbModel.fileName != null) {
-                            if (!auxApi.putPassportImageAsync(pageDbModel.page, fileHelper.getFilePart(pageDbModel.fileName)).execute().isSuccessful) {
+                            if (!auxApi.putPassportImageAsync(pageDbModel.page, fileHelper.getFilePart(pageDbModel.fileName)).execute(1).isSuccessful) {
                                 return null
                             }
                         } else {
