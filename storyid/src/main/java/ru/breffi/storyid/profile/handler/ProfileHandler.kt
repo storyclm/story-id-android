@@ -99,7 +99,9 @@ class ProfileHandler internal constructor(
                     .associateBy { it.page }
                 val updatedPassportPageDbModels = profile.passport.pages
                     .distinctBy { it.page }
+                    .filter { dbPages.contains(it.page) || it.file != null }
                     .map { mapper.getUpdatedPassportPageDbModel(it, dbPages[it.page]) }
+
 
                 profileDataDao.insertProfileData(
                     updatedProfileDbModel,

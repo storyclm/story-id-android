@@ -30,13 +30,11 @@ class PassportMapper(private val initialPages: List<PassportPageModel>) {
     }
 
     fun getUpdatedPages(): List<PassportPageModel> {
-        val initialPageIndices = initialPages.map { it.page }
         return pageMap.values
-            .filter { initialPageIndices.contains(it.page) || it.imageFile != null}
             .map {
                 PassportPageModel(it.imageFile, it.page)
             }
-
+            .toList()
     }
 
     private fun getPageFromFileName(name: String): Int {
