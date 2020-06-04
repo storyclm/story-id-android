@@ -15,11 +15,7 @@ data class PassportModel(
     val pages: List<PassportPageModel>
 ) {
 
-    fun page1(): PassportPageModel? {
-        return pages.find { it.page == 1 }
-    }
-
-    fun page2(): PassportPageModel? {
-        return pages.find { it.page == 2 }
+    fun page(index: Int): PassportPageModel? {
+        return pages.find { it.page == index }
     }
 }

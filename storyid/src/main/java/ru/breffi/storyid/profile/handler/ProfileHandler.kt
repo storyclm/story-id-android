@@ -62,13 +62,10 @@ class ProfileHandler internal constructor(
 
                 val snilsModel = mapper.getSnilsModel(profileDataDao.getUserSnils(userId))
 
-                val dbPagesMap = profileDataDao.getUserPassportPages(userId)
-                    .associateBy { it.page }
-                val passportModel = mapper.getPassportModel(
-                    profileDataDao.getUserPassport(userId),
-                    mapper.getPassportPageModel(dbPagesMap[1], 1),
-                    mapper.getPassportPageModel(dbPagesMap[2], 2)
-                )
+                val dbPages = profileDataDao.getUserPassportPages(userId)
+                    .map { mapper.getPassportPageModel(it) }
+                    .sortedBy { it.page }
+                val passportModel = mapper.getPassportModel(profileDataDao.getUserPassport(userId), dbPages)
 
                 mapper.getProfileModel(profileDbModel, demographicsModel, itnModel, snilsModel, passportModel)
             }
@@ -101,6 +98,7 @@ class ProfileHandler internal constructor(
                 val dbPages = profileDataDao.getUserPassportPages(userId)
                     .associateBy { it.page }
                 val updatedPassportPageDbModels = profile.passport.pages
+                    .distinctBy { it.page }
                     .map { mapper.getUpdatedPassportPageDbModel(it, dbPages[it.page]) }
 
                 profileDataDao.insertProfileData(
@@ -172,14 +170,18 @@ class ProfileHandler internal constructor(
         passportUpdateModel?.let {
             profileDataDao.insertPassport(it.dbModel)
             it.pages.forEach { pageUpdateModel ->
-                profileDataDao.insertPassportPage(pageUpdateModel.dbModel)
+                if (pageUpdateModel.dbModel != null) {
+                    profileDataDao.insertPassportPage(pageUpdateModel.dbModel)
+                } else {
+                    profileDataDao.deletePassportPage(pageUpdateModel.page)
+                }
                 if (pageUpdateModel.fileAction == FileAction.COPY_FROM_TMP) {
                     fileHelper.move(
-                        FileHelper.passportPageFilename(pageUpdateModel.dbModel.page, true),
-                        FileHelper.passportPageFilename(pageUpdateModel.dbModel.page)
+                        FileHelper.passportPageFilename(pageUpdateModel.page, true),
+                        FileHelper.passportPageFilename(pageUpdateModel.page)
                     )
                 } else if (pageUpdateModel.fileAction == FileAction.DELETE) {
-                    fileHelper.delete(FileHelper.passportPageFilename(pageUpdateModel.dbModel.page))
+                    fileHelper.delete(FileHelper.passportPageFilename(pageUpdateModel.page))
                 }
             }
         }
@@ -372,8 +374,6 @@ class ProfileHandler internal constructor(
             if (dataIsUpToDate(dbModel?.modifiedAt, inboundDto?.modifiedAt?.millis)) return null
 
             val pageDbModels = profileDataDao.getUserPassportPages(metadata.userId)
-            val fileActions = mutableMapOf<Int, FileAction>()
-            val pageFileNames = pageDbModels.associateBy({ it.page }, { it.fileName }).toMutableMap()
             if (dbModel != null && dbModel.modifiedAt > inboundDto?.modifiedAt?.millis ?: 0) {
                 val outboundDto = StoryPasportDTO()
                 outboundDto.code = dbModel.code
@@ -399,43 +399,44 @@ class ProfileHandler internal constructor(
                             }
                         }
                     }
+                    val localPagesMap = pageDbModels.associateBy { it.page }
+                        .toMutableMap()
                     val pageUpdateModels = setResultDto.pages
-                        ?.map { inboundPage ->
-                            mapper.getUpdatedPassportPageDbModel(
-                                inboundPage,
-                                pageDbModels.find { it.page == inboundPage.page },
-                                pageFileNames[inboundPage.page]
-                            )
+                        ?.map { pageDto ->
+                            val localPage = localPagesMap.remove(pageDto.page)
+                            val updatedDto = mapper.getUpdatedPassportPageDbModel(pageDto, localPage, localPage?.fileName)
+                            PassportPageUpdateModel(pageDto.page, updatedDto, FileAction.NO_OP)
                         }
-                        ?.map { PassportPageUpdateModel(it, fileActions[it.page] ?: FileAction.NO_OP) }
                         ?: listOf()
                     val updatedDbModel = mapper.getUpdatedPassportDbModel(setResultDto, dbModel)
                     PassportUpdateModel(updatedDbModel, pageUpdateModels)
                 }
             } else if (inboundDto != null) {
+                val pageUpdateModels = mutableListOf<PassportPageUpdateModel>()
                 if (inboundDto.pages == null) {
-                    fileActions[1] = FileAction.DELETE
-                    fileActions[2] = FileAction.DELETE
-                    profileDataDao.deletePassportPages()
+                    pageUpdateModels += pageDbModels.map {
+                        PassportPageUpdateModel(it.page, null, FileAction.DELETE)
+                    }
                 } else {
-                    inboundDto.pages?.forEach { page ->
-                        if (page.size ?: 0 == 0L) {
-                            fileActions[page.page] = FileAction.DELETE
-                            pageFileNames[page.page] = null
+                    val localPagesMap = pageDbModels.associateBy { it.page }
+                        .toMutableMap()
+                    inboundDto.pages?.forEach { pageDto ->
+                        if (pageDto.size ?: 0 == 0L) {
+                            pageUpdateModels += PassportPageUpdateModel(pageDto.page, null, FileAction.DELETE)
                         } else {
                             try {
-                                auxApi.getPassportImageAsync(page.page).execute().body()?.let { pageImage ->
+                                auxApi.getPassportImageAsync(pageDto.page).execute().body()?.let { pageImage ->
                                     val bitmap: Bitmap? = BitmapFactory.decodeStream(pageImage.byteStream())
                                     if (bitmap != null) {
-                                        fileHelper.copyFromBitmap(bitmap, FileHelper.passportPageFilename(page.page, true))
-                                        fileActions[page.page] = FileAction.COPY_FROM_TMP
-                                        pageFileNames[page.page] = FileHelper.passportPageFilename(page.page)
+                                        fileHelper.copyFromBitmap(bitmap, FileHelper.passportPageFilename(pageDto.page, true))
+                                        val localPage = localPagesMap.remove(pageDto.page)
+                                        val updatedDto = mapper.getUpdatedPassportPageDbModel(pageDto, localPage, FileHelper.passportPageFilename(pageDto.page))
+                                        pageUpdateModels += PassportPageUpdateModel(pageDto.page, updatedDto, FileAction.COPY_FROM_TMP)
                                     } else {
-                                        if (!auxApi.deletePassportImageAsync(page.page).execute().isSuccessful) {
+                                        if (!auxApi.deletePassportImageAsync(pageDto.page).execute().isSuccessful) {
                                             return null
                                         }
-                                        fileActions[page.page] = FileAction.DELETE
-                                        pageFileNames[page.page] = null
+                                        pageUpdateModels += PassportPageUpdateModel(pageDto.page, null, FileAction.DELETE)
                                     }
                                 }
                             } catch (e: IOException) {
@@ -444,17 +445,10 @@ class ProfileHandler internal constructor(
                             }
                         }
                     }
-                }
-                val pageUpdateModels = inboundDto.pages
-                    ?.map { inboundPage ->
-                        mapper.getUpdatedPassportPageDbModel(
-                            inboundPage,
-                            pageDbModels.find { it.page == inboundPage.page },
-                            pageFileNames[inboundPage.page]
-                        )
+                    pageUpdateModels += localPagesMap.values.map {
+                        PassportPageUpdateModel(it.page, null, FileAction.DELETE)
                     }
-                    ?.map { PassportPageUpdateModel(it, fileActions[it.page] ?: FileAction.NO_OP) }
-                    ?: listOf()
+                }
                 val updatedDbModel = mapper.getUpdatedPassportDbModel(inboundDto, dbModel)
                 return PassportUpdateModel(updatedDbModel, pageUpdateModels)
             } else {

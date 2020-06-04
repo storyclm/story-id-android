@@ -67,7 +67,7 @@ internal class ProfileDbMapper(private val fileHelper: FileHelper, private val m
         } ?: SnilsModel()
     }
 
-    fun getPassportModel(dbModel: PassportDbModel?, passportPage1Model: PassportPageModel, passportPage2Model: PassportPageModel): PassportModel {
+    fun getPassportModel(dbModel: PassportDbModel?, passportPageModels: List<PassportPageModel>): PassportModel {
         return dbModel?.let {
             PassportModel(
                 sn = dbModel.sn,
@@ -75,19 +75,12 @@ internal class ProfileDbMapper(private val fileHelper: FileHelper, private val m
                 issuedBy = dbModel.issuedBy,
                 issuedAt = dbModel.issuedAt,
                 verified = dbModel.verified,
-                pages = listOf(passportPage1Model, passportPage2Model)
+                pages = passportPageModels
             )
-        } ?: PassportModel(pages = listOf(passportPage1Model, passportPage2Model))
+        } ?: PassportModel(pages = passportPageModels)
     }
 
-    fun getPassportPageModel(dbModel: PassportPageDbModel?, page: Int): PassportPageModel {
-        return dbModel?.let {
-            PassportPageModel(
-                page = dbModel.page,
-                file = dbModel.fileName?.let { fileHelper.getFile(it) }
-            )
-        } ?: PassportPageModel(
-            page = page
-        )
+    fun getPassportPageModel(dbModel: PassportPageDbModel): PassportPageModel {
+        return PassportPageModel(page = dbModel.page, file = dbModel.fileName?.let { fileHelper.getFile(it) })
     }
 }

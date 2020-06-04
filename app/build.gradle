@@ -81,6 +81,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
     implementation 'androidx.fragment:fragment-ktx:1.2.0'
+    implementation 'com.github.moqod.mqd-android-utils:ui-utils:9eaaf83fa2'
 
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'

@@ -67,11 +67,11 @@
 
                 <ImageView
                     android:id="@+id/addItn"
-                    android:layout_width="@dimen/base_64"
-                    android:layout_height="@dimen/base_64"
+                    android:layout_width="@dimen/doc_image_width"
+                    android:layout_height="@dimen/doc_image_height"
                     android:layout_marginStart="@dimen/base_8"
                     android:layout_marginEnd="@dimen/base_8"
-                    android:src="@drawable/img_add_doc"
+                    android:background="@drawable/ic_add_image"
                     />
 
             </LinearLayout>

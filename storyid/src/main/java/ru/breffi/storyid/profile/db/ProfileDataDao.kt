@@ -83,8 +83,8 @@ abstract class ProfileDataDao {
     @Query("DELETE FROM passport_page_data")
     abstract fun deletePassportPages()
 
-    @Query("DELETE FROM passport_page_data WHERE userId = :userId AND page = :page")
-    abstract fun deletePassportPage(userId: String, page: Int)
+    @Query("DELETE FROM passport_page_data WHERE page = :page")
+    abstract fun deletePassportPage(page: Int)
 
     @Transaction
     open fun insertProfileData(

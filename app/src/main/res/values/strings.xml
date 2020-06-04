@@ -72,7 +72,7 @@
 
     <string name="title_passport">Паспорт</string>
     <string name="hint_passport">Номер и серия</string>
-    <string name="label_passport_scan">Фото паспорта 1 и 3–4 страницы</string>
+    <string name="label_passport_scan">Фото паспорта</string>
 
     <string name="message_remove_current_image">Удалить выбранное изображение?</string>
 
@@ -93,4 +93,6 @@
     <string name="label_new_card">Новая карта</string>
     <string name="label_create">Создать</string>
     <string name="label_cards">Карты</string>
+
+    <string name="passport_page_item_title">Фото %s стр.</string>
 </resources>
