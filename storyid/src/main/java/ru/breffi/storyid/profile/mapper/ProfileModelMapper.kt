@@ -9,7 +9,7 @@ import java.io.File
 
 internal class ProfileModelMapper(private val metadata: Metadata, private val fileHelper: FileHelper) {
 
-    fun getUpdatedProfileDbModel(model: ProfileModel, dbModel: ProfileDbModel?): ProfileDbModel {
+    fun getUpdatedProfileDbModel(model: ProfileIdModel, dbModel: ProfileDbModel?): ProfileDbModel {
         val updatedDbModel = dbModel ?: ProfileDbModel(
             internalId = newId(),
             createdAt = metadata.timestamp,
@@ -82,7 +82,7 @@ internal class ProfileModelMapper(private val metadata: Metadata, private val fi
         )
     }
 
-    fun getUpdatedPassportDbModel(model: PassportModel, dbModel: PassportDbModel?): PassportDbModel {
+    fun getUpdatedPassportDbModel(model: PassportDataModel, dbModel: PassportDbModel?): PassportDbModel {
         val updatedDbModel = dbModel ?: PassportDbModel(
             internalId = newId(),
             modifiedAt = metadata.timestamp,

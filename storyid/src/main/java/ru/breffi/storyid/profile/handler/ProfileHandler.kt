@@ -57,6 +57,8 @@ class ProfileHandler internal constructor(
                 val metadata = Metadata(userId, System.currentTimeMillis())
                 val mapper = ProfileDbMapper(fileHelper, metadata)
 
+                val profileIdModel = mapper.getProfileIdModel(profileDbModel)
+
                 val demographicsModel = mapper.getDemographicsModel(profileDataDao.getUserDemographics(userId))
 
                 val itnModel = mapper.getItnModel(profileDataDao.getUserItn(userId))
@@ -68,7 +70,7 @@ class ProfileHandler internal constructor(
                     .sortedBy { it.page }
                 val passportModel = mapper.getPassportModel(profileDataDao.getUserPassport(userId), dbPages)
 
-                mapper.getProfileModel(profileDbModel, demographicsModel, itnModel, snilsModel, passportModel)
+                mapper.getProfileModel(profileIdModel, demographicsModel, itnModel, snilsModel, passportModel)
             }
         }
     }
@@ -81,28 +83,37 @@ class ProfileHandler internal constructor(
             authDataProvider.getAuthData()?.userId?.let { userId ->
                 val metadata = Metadata(userId, System.currentTimeMillis())
                 val mapper = ProfileModelMapper(metadata, fileHelper)
-                val updatedProfileDbModel = mapper.getUpdatedProfileDbModel(
-                    profile, profileDataDao.getUserProfile(userId)
-                )
-                val updatedDemographicsDbModel = mapper.getUpdatedDemographicsDbModel(
-                    profile.demographics, profileDataDao.getUserDemographics(userId)
-                )
-                val updatedItnDbModel = mapper.getUpdatedItnDbModel(
-                    profile.itn, profileDataDao.getUserItn(userId)
-                )
-                val updatedSnilsDbModel = mapper.getUpdatedSnilsDbModel(
-                    profile.snils, profileDataDao.getUserSnils(userId)
-                )
-                val updatedPassportDbModel = mapper.getUpdatedPassportDbModel(
-                    profile.passport, profileDataDao.getUserPassport(userId)
-                )
+                val savedProfile = getProfile()
+
+                val updatedProfileDbModel = if (savedProfile?.profileId == profile.profileId) {
+                    mapper.getUpdatedProfileDbModel(profile.profileId, profileDataDao.getUserProfile(userId))
+                } else null
+                val updatedDemographicsDbModel = if (savedProfile?.demographics != profile.demographics) {
+                    mapper.getUpdatedDemographicsDbModel(profile.demographics, profileDataDao.getUserDemographics(userId))
+                } else null
+                val updatedItnDbModel = if (savedProfile?.itn != profile.itn) {
+                     mapper.getUpdatedItnDbModel(profile.itn, profileDataDao.getUserItn(userId))
+                } else null
+                val updatedSnilsDbModel = if (savedProfile?.snils != profile.snils) {
+                    mapper.getUpdatedSnilsDbModel(profile.snils, profileDataDao.getUserSnils(userId))
+                } else null
+
+                val passportChanged = savedProfile?.passport?.passportData != profile.passport.passportData
                 val dbPages = profileDataDao.getUserPassportPages(userId)
                     .associateBy { it.page }
-                val updatedPassportPageDbModels = profile.passport.pages
+                val pages = profile.passport.pages
                     .distinctBy { it.page }
                     .filter { dbPages.contains(it.page) || it.file != null }
-                    .map { mapper.getUpdatedPassportPageDbModel(it, dbPages[it.page]) }
-
+                    .sortedBy { it.page }
+                val passportPagesChanged = savedProfile?.passport?.pages?.sortedBy { it.page } != pages
+                val updatedPassportDbModel = if (passportChanged || passportPagesChanged)
+                    mapper.getUpdatedPassportDbModel(profile.passport.passportData, profileDataDao.getUserPassport(userId)) else
+                    null
+                val updatedPassportPageDbModels = if (passportPagesChanged) {
+                    pages.map {
+                        mapper.getUpdatedPassportPageDbModel(it, dbPages[it.page])
+                    }
+                } else null
 
                 profileDataDao.insertProfileData(
                     updatedProfileDbModel,

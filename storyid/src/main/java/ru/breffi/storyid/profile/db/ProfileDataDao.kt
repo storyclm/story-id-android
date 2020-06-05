@@ -88,19 +88,19 @@ abstract class ProfileDataDao {
 
     @Transaction
     open fun insertProfileData(
-        profileDbModel: ProfileDbModel,
-        demographicsDbModel: DemographicsDbModel,
-        itnDbModel: ItnDbModel,
-        snilsDbModel: SnilsDbModel,
-        passportDbModel: PassportDbModel,
-        passportPageDbModels: List<PassportPageDbModel>
+        profileDbModel: ProfileDbModel? = null,
+        demographicsDbModel: DemographicsDbModel? = null,
+        itnDbModel: ItnDbModel? = null,
+        snilsDbModel: SnilsDbModel? = null,
+        passportDbModel: PassportDbModel? = null,
+        passportPageDbModels: List<PassportPageDbModel>? = null
     ) {
-        insertProfile(profileDbModel)
-        insertDemographics(demographicsDbModel)
-        insertItn(itnDbModel)
-        insertSnils(snilsDbModel)
-        insertPassport(passportDbModel)
-        insertPassportPages(passportPageDbModels)
+        profileDbModel?.let { insertProfile(it) }
+        demographicsDbModel?.let { insertDemographics(it) }
+        itnDbModel?.let { insertItn(it) }
+        snilsDbModel?.let { insertSnils(it) }
+        passportDbModel?.let { insertPassport(it) }
+        passportPageDbModels?.let { insertPassportPages(it) }
     }
 
     @Transaction

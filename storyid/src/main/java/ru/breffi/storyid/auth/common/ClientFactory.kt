@@ -11,7 +11,7 @@ internal object ClientFactory {
 
     fun createDefaultClient(tokenHandler: TokenHandler): OkHttpClient {
         val logger = HttpLoggingInterceptor.Logger { message ->
-            if (message.length < 1000) {
+            if (message.length < 5000) {
                 Log.d(LOGGER_TAG, message)
             } else {
                 Log.d(LOGGER_TAG, "Message is too long...")

@@ -86,7 +86,10 @@ class PersonalDataFragment : BasePageInjectableFragment() {
 
             val mail = email.getText().trim()
             if (mail.validateEmail()) {
-                profile = profile?.copy(email = mail.orNull(), emailVerified = false)
+                profile = profile?.let {
+                    val profileId = it.profileId.copy(email = mail.orNull(), emailVerified = false)
+                    it.copy(profileId = profileId)
+                }
 
                 email.wasChanged = false
             }
@@ -109,15 +112,15 @@ class PersonalDataFragment : BasePageInjectableFragment() {
 
     private fun handleProfileResource(profile: ProfileModel) {
         this.profile = profile
-
-        phone.setText(profile.phone)
-        email.setText(profile.email)
+        val profileId = profile.profileId
+        phone.setText(profileId.phone)
+        email.setText(profileId.email)
 
         phone.text.addTextChangedListener {
-            changeState.itemChanged("phone", it.toString() != profile.phone)
+            changeState.itemChanged("phone", it.toString() != profileId.phone)
         }
         email.text.addTextChangedListener {
-            changeState.itemChanged("email", it.toString() != profile.email)
+            changeState.itemChanged("email", it.toString() != profileId.email)
         }
 
         handleProfileDemographicsResource(profile.demographics)

@@ -84,8 +84,8 @@ class PassportFragment : ImageFragment(), PageAdapter.Listener {
 
         buttonSave.setOnClickListener {
             profile = profile?.let {
-                val passportModel = it.passport.copy(sn = tvPassport.getText().orNull())
-                it.copy(passport = passportModel.copy(pages = passportMapper.getUpdatedPages()))
+                val passportDataModel = it.passport.passportData.copy(sn = tvPassport.getText().orNull())
+                it.copy(passport = it.passport.copy(passportData = passportDataModel, pages = passportMapper.getUpdatedPages()))
             }
 
             viewModel.saveProfile(profile)
@@ -118,7 +118,8 @@ class PassportFragment : ImageFragment(), PageAdapter.Listener {
     }
 
     private fun handleProfilePassport(passport: PassportModel) {
-        val passportNumber = "${passport.sn ?: ""} ${passport.code ?: ""}".trim()
+        val passportData = passport.passportData
+        val passportNumber = "${passportData.sn ?: ""} ${passportData.code ?: ""}".trim()
         tvPassport.setText(passportNumber)
 
         passportMapper = PassportMapper(passport.pages)
@@ -127,7 +128,7 @@ class PassportFragment : ImageFragment(), PageAdapter.Listener {
         pages_recycler_view.layoutManager = GridLayoutManager(context, 2)
 
         tvPassport.text.addTextChangedListener {
-            changeState.itemChanged("number", it.toString() != passport.sn)
+            changeState.itemChanged("number", it.toString() != passportData.sn)
         }
     }
 
