@@ -2,15 +2,10 @@ package ru.breffi.storyid.profile.handler
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Handler
-import android.os.Looper
 import org.joda.time.DateTime
 import ru.breffi.storyid.auth.common.AuthDataProvider
 import ru.breffi.storyid.generated_api.model.*
 import ru.breffi.storyid.profile.api.ApiServiceProvider
-import ru.breffi.storyid.profile.util.FileHelper
-import ru.breffi.storyid.profile.api.AuxApi
-import ru.breffi.storyid.profile.util.dataIsUpToDate
 import ru.breffi.storyid.profile.db.ProfileDataDao
 import ru.breffi.storyid.profile.db.dto.DemographicsDbModel
 import ru.breffi.storyid.profile.db.dto.ProfileDbModel
@@ -19,11 +14,12 @@ import ru.breffi.storyid.profile.mapper.ProfileDtoMapper
 import ru.breffi.storyid.profile.mapper.ProfileModelMapper
 import ru.breffi.storyid.profile.model.ProfileModel
 import ru.breffi.storyid.profile.model.internal.*
+import ru.breffi.storyid.profile.util.FileHelper
+import ru.breffi.storyid.profile.util.dataIsUpToDate
 import ru.breffi.storyid.profile.util.get
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
-import java.util.stream.Stream
 import kotlin.concurrent.withLock
 
 class ProfileHandler internal constructor(

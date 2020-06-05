@@ -3,9 +3,6 @@ package ru.breffi.storyid.profile.handler
 import ru.breffi.storyid.auth.common.AuthDataProvider
 import ru.breffi.storyid.generated_api.model.FileViewModel
 import ru.breffi.storyid.profile.api.ApiServiceProvider
-import ru.breffi.storyid.profile.util.FileHelper
-import ru.breffi.storyid.profile.api.AuxApi
-import ru.breffi.storyid.profile.util.dataIsUpToDate
 import ru.breffi.storyid.profile.db.FilesDataDao
 import ru.breffi.storyid.profile.mapper.FileMapper
 import ru.breffi.storyid.profile.mapper.FileModelMapper
@@ -15,6 +12,8 @@ import ru.breffi.storyid.profile.model.FilePathModel
 import ru.breffi.storyid.profile.model.internal.FileAction
 import ru.breffi.storyid.profile.model.internal.FileUpdateModel
 import ru.breffi.storyid.profile.model.internal.Metadata
+import ru.breffi.storyid.profile.util.FileHelper
+import ru.breffi.storyid.profile.util.dataIsUpToDate
 import ru.breffi.storyid.profile.util.get
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
