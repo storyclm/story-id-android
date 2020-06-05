@@ -15,7 +15,6 @@ import ru.breffi.storyid.profile.model.FilePathModel
 import ru.breffi.storyid.profile.model.internal.FileAction
 import ru.breffi.storyid.profile.model.internal.FileUpdateModel
 import ru.breffi.storyid.profile.model.internal.Metadata
-import ru.breffi.storyid.profile.util.execute
 import ru.breffi.storyid.profile.util.get
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
@@ -141,7 +140,7 @@ class FileHandler internal constructor(
             dbModels.forEach { dbModel ->
                 if (dbModel.id == null) {
                     if (dbModel.fileName != null) {
-                        if (!auxApi.putFileAsync(dbModel.category, dbModel.name, fileHelper.getFilePart(dbModel.fileName)).execute(1).isSuccessful) {
+                        if (!auxApi.putFileAsync(dbModel.category, dbModel.name, fileHelper.getFilePart(dbModel.fileName)).execute().isSuccessful) {
                             return null
                         }
                         apiServiceProvider.getProfileFilesApi().getCategoryFileByName(dbModel.category, dbModel.name).get()?.data?.let {

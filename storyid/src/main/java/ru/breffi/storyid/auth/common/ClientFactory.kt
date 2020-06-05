@@ -26,6 +26,7 @@ internal object ClientFactory {
             .writeTimeout(15, TimeUnit.SECONDS)
             .addInterceptor(authInterceptor)
             .authenticator(authInterceptor)
+            .addInterceptor(RetryInterceptor())
             .addInterceptor(httpLoggingInterceptor)
             .retryOnConnectionFailure(true)
             .build()

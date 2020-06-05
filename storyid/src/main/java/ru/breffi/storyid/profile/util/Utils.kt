@@ -22,17 +22,6 @@ internal fun <T> Call<T>.get(): ApiResult<T>? {
     }
 }
 
-@Throws(IOException::class)
-internal fun <T> Call<T>.execute(retryCount: Int): Response<T> {
-    var response: Response<T>
-    var i = 0
-    do {
-        response = clone().execute()
-        i++
-    } while (!response.isSuccessful && i <= retryCount)
-    return response
-}
-
 internal fun newId(): String {
     return UUID.randomUUID().toString()
 }
