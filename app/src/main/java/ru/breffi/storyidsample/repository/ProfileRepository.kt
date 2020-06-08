@@ -34,6 +34,7 @@ constructor(profileInteractor: ProfileInteractor) {
     suspend fun saveProfile(profile: ProfileModel) {
         withContext(Dispatchers.IO) {
             profileHandler.updateProfile(profile)
+            profileChannel.postValue(profileHandler.getProfile())
         }
     }
 
