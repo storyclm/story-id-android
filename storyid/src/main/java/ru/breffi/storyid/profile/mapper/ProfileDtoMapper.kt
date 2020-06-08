@@ -3,7 +3,7 @@ package ru.breffi.storyid.profile.mapper
 import ru.breffi.storyid.generated_api.model.*
 import ru.breffi.storyid.profile.db.dto.*
 import ru.breffi.storyid.profile.model.internal.Metadata
-import ru.breffi.storyid.profile.newId
+import ru.breffi.storyid.profile.util.newId
 
 internal class ProfileDtoMapper(private val metadata: Metadata) {
 

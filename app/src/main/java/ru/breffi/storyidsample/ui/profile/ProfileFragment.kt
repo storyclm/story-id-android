@@ -12,12 +12,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.fragment_profile.*
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.auth.AuthActivity
+import ru.breffi.storyidsample.ui.bank_accounts.BankAccountsFragment
 import ru.breffi.storyidsample.ui.common.glide.GlideApp
 import ru.breffi.storyidsample.ui.itn.ItnFragment
 import ru.breffi.storyidsample.ui.passport.PassportFragment
 import ru.breffi.storyidsample.ui.personal_data.PersonalDataFragment
 import ru.breffi.storyidsample.ui.snils.SnilsFragment
-import ru.breffi.storyidsample.utils.ImageFragment
+import ru.breffi.storyidsample.ui.common.ImageFragment
 
 import java.io.File
 import javax.inject.Inject
@@ -46,7 +47,7 @@ class ProfileFragment : ImageFragment() {
     }
 
     override fun onDeleteImage(fileName: String) {
-        viewModel.deleteAvatarImage(fileName)
+        viewModel.deleteAvatarImage()
     }
 
     override fun getTitle(context: Context, toolbarFreeWidth: Int): CharSequence {
@@ -92,6 +93,10 @@ class ProfileFragment : ImageFragment() {
 
         passport.setOnClickListener {
             nextFragment(PassportFragment.newInstance())
+        }
+
+        bankAccounts.setOnClickListener {
+            nextFragment(BankAccountsFragment.newInstance())
         }
     }
 

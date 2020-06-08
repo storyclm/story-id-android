@@ -2,6 +2,8 @@ package ru.breffi.storyidsample.di
 
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
+import ru.breffi.storyidsample.ui.bank_account.BankAccountFragment
+import ru.breffi.storyidsample.ui.bank_accounts.BankAccountsFragment
 import ru.breffi.storyidsample.ui.itn.ItnFragment
 import ru.breffi.storyidsample.ui.passport.PassportFragment
 import ru.breffi.storyidsample.ui.personal_data.PersonalDataFragment
@@ -25,4 +27,10 @@ abstract class NavigationFragmentsProvider {
 
     @ContributesAndroidInjector
     abstract fun contributePassportFragment(): PassportFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeBankAccountsFragment(): BankAccountsFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeBankAccountFragment(): BankAccountFragment
 }

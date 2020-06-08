@@ -18,8 +18,9 @@ import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.common.glide.GlideApp
 import ru.breffi.storyidsample.ui.common.model.ChangeState
-import ru.breffi.storyidsample.utils.ImageFragment
+import ru.breffi.storyidsample.ui.common.ImageFragment
 import ru.breffi.storyidsample.utils.applyMask
+import ru.breffi.storyidsample.utils.orNull
 import ru.breffi.storyidsample.utils.setButtonEnabled
 import java.io.File
 import javax.inject.Inject
@@ -80,7 +81,7 @@ class ItnFragment : ImageFragment() {
 
         buttonSave.setOnClickListener {
             profile = profile?.let {
-                val itnModel = it.itn.copy(itn = tvItn.getText(), file = viewModel.imageItn.value)
+                val itnModel = it.itn.copy(itn = tvItn.getText().orNull(), file = viewModel.imageItn.value)
                 it.copy(itn = itnModel)
             }
 
@@ -96,9 +97,9 @@ class ItnFragment : ImageFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        viewModel.profile.observe(viewLifecycleOwner) { profileModel ->
+        viewModel.profile.observeFirstNonNull(viewLifecycleOwner) { profileModel ->
             profile = profileModel
-            profileModel?.let { handleProfileItn(it.itn) }
+            handleProfileItn(profileModel.itn)
         }
 
         viewModel.imageItn.observe(viewLifecycleOwner) { file ->
@@ -111,8 +112,6 @@ class ItnFragment : ImageFragment() {
                 }
             }
         }
-
-        viewModel.start()
     }
 
     private fun setItnImage(image: File) {

@@ -1,4 +1,4 @@
-package ru.breffi.storyid.profile
+package ru.breffi.storyid.profile.api
 
 import okhttp3.OkHttpClient
 import ru.breffi.storyid.generated_api.ApiClient
@@ -14,6 +14,7 @@ internal class ApiServiceProvider(client: OkHttpClient, baseApiUrl: String) {
     private lateinit var profileSnilsApi: ProfileSnilsApi
     private lateinit var profilePassportApi: ProfilePasportApi
     private lateinit var profileBankAccountsApi: ProfileBankAccountsApi
+    private lateinit var profileFilesApi: ProfileFilesApi
 
     private lateinit var auxApi: AuxApi
 
@@ -64,6 +65,13 @@ internal class ApiServiceProvider(client: OkHttpClient, baseApiUrl: String) {
             profileBankAccountsApi = apiClient.createService(ProfileBankAccountsApi::class.java)
         }
         return profileBankAccountsApi
+    }
+
+    fun getProfileFilesApi(): ProfileFilesApi {
+        if (!::profileFilesApi.isInitialized) {
+            profileFilesApi = apiClient.createService(ProfileFilesApi::class.java)
+        }
+        return profileFilesApi
     }
 
     fun getAuxApi(): AuxApi {

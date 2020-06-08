@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import kotlinx.android.synthetic.main.fragment_itn.*
 import kotlinx.android.synthetic.main.fragment_snils.*
 import kotlinx.android.synthetic.main.fragment_snils.buttonSave
 import kotlinx.android.synthetic.main.layout_doc_image.view.*
@@ -20,9 +19,9 @@ import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.common.glide.GlideApp
 import ru.breffi.storyidsample.ui.common.model.ChangeState
-import ru.breffi.storyidsample.ui.itn.ItnFragment
-import ru.breffi.storyidsample.utils.ImageFragment
+import ru.breffi.storyidsample.ui.common.ImageFragment
 import ru.breffi.storyidsample.utils.applyMask
+import ru.breffi.storyidsample.utils.orNull
 import ru.breffi.storyidsample.utils.setButtonEnabled
 import java.io.File
 import javax.inject.Inject
@@ -65,10 +64,6 @@ class SnilsFragment : ImageFragment() {
         return R.layout.fragment_snils
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -83,7 +78,7 @@ class SnilsFragment : ImageFragment() {
 
         buttonSave.setOnClickListener {
             profile = profile?.let {
-                val snilsModel = it.snils.copy(snils = tvSnils.getText(), file = viewModel.imageSnils.value)
+                val snilsModel = it.snils.copy(snils = tvSnils.getText().orNull(), file = viewModel.imageSnils.value)
                 it.copy(snils = snilsModel)
             }
 
@@ -100,9 +95,9 @@ class SnilsFragment : ImageFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        viewModel.profile.observe(viewLifecycleOwner) { profileModel ->
+        viewModel.profile.observeFirstNonNull(viewLifecycleOwner) { profileModel ->
             profile = profileModel
-            profileModel?.let { handleProfileSnils(it.snils) }
+            handleProfileSnils(profileModel.snils)
         }
 
         viewModel.imageSnils.observe(viewLifecycleOwner) { file ->
@@ -115,8 +110,6 @@ class SnilsFragment : ImageFragment() {
                 }
             }
         }
-
-        viewModel.start()
     }
 
     private fun setSnilsImage(image: File) {

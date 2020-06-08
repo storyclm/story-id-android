@@ -1,6 +1,6 @@
 package ru.breffi.storyid.profile.mapper
 
-import ru.breffi.storyid.profile.FileHelper
+import ru.breffi.storyid.profile.util.FileHelper
 import ru.breffi.storyid.profile.db.dto.*
 import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyid.profile.model.internal.Metadata
@@ -8,31 +8,33 @@ import ru.breffi.storyid.profile.model.internal.Metadata
 internal class ProfileDbMapper(private val fileHelper: FileHelper, private val metadata: Metadata) {
 
     fun getProfileModel(
-        dbModel: ProfileDbModel?,
+        profileIdModel: ProfileIdModel,
         demographicsModel: DemographicsModel,
         itnModel: ItnModel,
         snilsModel: SnilsModel,
         passportModel: PassportModel
     ): ProfileModel {
+        return ProfileModel(
+            profileId = profileIdModel,
+            demographics = demographicsModel,
+            itn = itnModel,
+            snils = snilsModel,
+            passport = passportModel
+        )
+    }
+
+    fun getProfileIdModel(dbModel: ProfileDbModel?): ProfileIdModel {
         return dbModel?.let {
-            ProfileModel(
+            ProfileIdModel(
                 userId = dbModel.userId,
                 phone = dbModel.phone,
                 phoneVerified = dbModel.phoneVerified,
                 username = dbModel.username,
                 email = dbModel.email,
-                emailVerified = dbModel.emailVerified,
-                demographics = demographicsModel,
-                itn = itnModel,
-                snils = snilsModel,
-                passport = passportModel
+                emailVerified = dbModel.emailVerified
             )
-        } ?: ProfileModel(
-            userId = metadata.userId,
-            demographics = demographicsModel,
-            itn = itnModel,
-            snils = snilsModel,
-            passport = passportModel
+        } ?: ProfileIdModel(
+            userId = metadata.userId
         )
     }
 
@@ -67,27 +69,22 @@ internal class ProfileDbMapper(private val fileHelper: FileHelper, private val m
         } ?: SnilsModel()
     }
 
-    fun getPassportModel(dbModel: PassportDbModel?, passportPage1Model: PassportPageModel, passportPage2Model: PassportPageModel): PassportModel {
+    fun getPassportModel(dbModel: PassportDbModel?, passportPageModels: List<PassportPageModel>): PassportModel {
         return dbModel?.let {
             PassportModel(
-                sn = dbModel.sn,
-                code = dbModel.code,
-                issuedBy = dbModel.issuedBy,
-                issuedAt = dbModel.issuedAt,
-                verified = dbModel.verified,
-                pages = listOf(passportPage1Model, passportPage2Model)
+                passportData = PassportDataModel(
+                    sn = dbModel.sn,
+                    code = dbModel.code,
+                    issuedBy = dbModel.issuedBy,
+                    issuedAt = dbModel.issuedAt,
+                    verified = dbModel.verified
+                ),
+                pages = passportPageModels
             )
-        } ?: PassportModel(pages = listOf(passportPage1Model, passportPage2Model))
+        } ?: PassportModel(passportData = PassportDataModel(), pages = passportPageModels)
     }
 
-    fun getPassportPageModel(dbModel: PassportPageDbModel?, page: Int): PassportPageModel {
-        return dbModel?.let {
-            PassportPageModel(
-                page = dbModel.page,
-                file = dbModel.fileName?.let { fileHelper.getFile(it) }
-            )
-        } ?: PassportPageModel(
-            page = page
-        )
+    fun getPassportPageModel(dbModel: PassportPageDbModel): PassportPageModel {
+        return PassportPageModel(page = dbModel.page, file = dbModel.fileName?.let { fileHelper.getFile(it) })
     }
 }

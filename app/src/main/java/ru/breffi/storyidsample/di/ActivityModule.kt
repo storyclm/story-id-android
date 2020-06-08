@@ -4,6 +4,8 @@ package ru.breffi.storyidsample.di
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import ru.breffi.storyidsample.ui.auth.AuthActivity
+import ru.breffi.storyidsample.ui.bank_account.BankAccountActivity
+import ru.breffi.storyidsample.ui.bank_account.BankAccountFragmentProvider
 import ru.breffi.storyidsample.ui.confirm_code.ConfirmCodeActivity
 import ru.breffi.storyidsample.ui.common.navigation.NavigationActivity
 import ru.breffi.storyidsample.ui.pin_code.PinCodeActivity
@@ -30,4 +32,7 @@ abstract class ActivityModule {
 
     @ContributesAndroidInjector(modules = [NavigationFragmentsProvider::class])
     abstract fun contributeNavigationActivity(): NavigationActivity
+
+    @ContributesAndroidInjector(modules = [BankAccountFragmentProvider::class])
+    abstract fun contributeBankAccountActivity(): BankAccountActivity
 }

@@ -3,10 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-def apiProperties = 'api.properties'
+
 def properties = new Properties()
-if (project.rootProject.file(apiProperties).exists()) {
-    properties.load(project.rootProject.file(apiProperties).newDataInputStream())
+for (file in project.rootDir.listFiles().sort()) {
+    if (file.name.endsWith(".properties") && file.name != "gradle.properties") {
+        properties.load(file.newDataInputStream())
+    }
 }
 
 android {
@@ -79,6 +81,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
     implementation 'androidx.fragment:fragment-ktx:1.2.0'
+    implementation 'com.github.moqod.mqd-android-utils:ui-utils:9eaaf83fa2'
 
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'

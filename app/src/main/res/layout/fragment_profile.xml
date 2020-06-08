@@ -187,6 +187,36 @@
                 app:layout_constraintTop_toBottomOf="@+id/divider3"
                 />
 
+            <View
+                android:id="@+id/divider4"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="@dimen/base_1"
+                android:layout_marginStart="@dimen/base_20"
+                android:background="#1F000000"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/passport"
+                />
+
+            <TextView
+                android:id="@+id/bankAccounts"
+                android:layout_width="@dimen/base_0"
+                android:layout_height="wrap_content"
+                android:minHeight="55dp"
+                android:drawableEnd="@drawable/ic_arrow"
+                android:drawablePadding="@dimen/base_36"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/base_20"
+                android:paddingEnd="@dimen/base_20"
+                android:text="@string/button_bank_card_list"
+                android:textAppearance="@style/RobotoRegular.16"
+                android:textColor="#DE000000"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider4"
+                />
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View

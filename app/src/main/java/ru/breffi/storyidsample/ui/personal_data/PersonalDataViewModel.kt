@@ -9,6 +9,7 @@ import ru.breffi.storyidsample.repository.work.ProfileSyncWorker
 import kotlinx.coroutines.launch
 import ru.breffi.storyid.profile.model.ProfileModel
 import ru.breffi.storyidsample.repository.ProfileRepository
+import ru.breffi.storyidsample.ui.common.LiveDataWrapper
 import javax.inject.Inject
 
 
@@ -19,11 +20,7 @@ constructor(
 ) : ViewModel() {
 
     val start = MutableLiveData<Long>()
-    val profile = start.switchMap { profileRepository.getProfile() }
-
-    fun start() {
-        start.postValue(0L)
-    }
+    val profile = LiveDataWrapper(profileRepository.getProfile())
 
     fun saveProfile(profile: ProfileModel?) {
         viewModelScope.launch {

@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.include_app_bar.*
 import ru.breffi.storyid.auth.common.model.AuthState
 import ru.breffi.storyidsample.ui.common.BaseInjectableActivity
 import ru.breffi.storyidsample.R
+import ru.breffi.storyidsample.ui.common.PositiveOrDismissDialog
 import ru.breffi.storyidsample.ui.confirm_code.ConfirmCodeActivity
 import ru.breffi.storyidsample.ui.common.navigation.NavigationActivity
 import ru.breffi.storyidsample.ui.pin_code.PinCodeActivity
@@ -111,8 +112,15 @@ class AuthActivity : BaseInjectableActivity() {
             when (requestCode) {
                 REQUEST_CONFIRM_CODE -> {
                     if (data != null && data.getStringExtra(ConfirmCodeActivity.ARGS_NEXT_SCREEN) == ConfirmCodeActivity.ARG_SCREEN_PIN) {
-                        PinCodeActivity.start(this, PinCodeActivity.MODE_SET)
-                        finish()
+                        PositiveOrDismissDialog(context, R.style.DialogTheme)
+                            .setMessage(R.string.dialog_set_pin)
+                            .setPositive(R.string.button_yes) {
+                                openPinScreen()
+                            }
+                            .setDismiss(R.string.dialog_set_pin_skip) {
+                                openMainScreen()
+                            }
+                            .show()
                     } else {
                         openMainScreen()
                     }
@@ -123,6 +131,11 @@ class AuthActivity : BaseInjectableActivity() {
 
     private fun openMainScreen() {
         NavigationActivity.start(this, intent, true)
+        finish()
+    }
+
+    private fun openPinScreen() {
+        PinCodeActivity.start(this, PinCodeActivity.MODE_SET)
         finish()
     }
 }

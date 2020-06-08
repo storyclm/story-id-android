@@ -22,6 +22,8 @@ import kotlinx.android.synthetic.main.activity_confirm_code.*
 import kotlinx.android.synthetic.main.include_app_bar.*
 import ru.breffi.storyid.auth.common.model.AuthState
 import ru.breffi.storyidsample.R
+import ru.breffi.storyidsample.repository.work.BankAccountsSyncWorker
+import ru.breffi.storyidsample.repository.work.FilesSyncWorker
 import ru.breffi.storyidsample.utils.*
 import ru.breffi.storyidsample.valueobject.Resource
 import java.io.IOException
@@ -166,15 +168,14 @@ class ConfirmCodeActivity : BaseInjectableActivity() {
                     showProgress(false)
 
                     ProfileSyncWorker.start(applicationContext)
+                    BankAccountsSyncWorker.start(applicationContext)
+                    FilesSyncWorker.start(applicationContext)
 
                     timer?.cancel()
                     hideKeyboard()
 
                     val intent = Intent()
-                    intent.putExtra(
-                        ARGS_NEXT_SCREEN,
-                        ARG_SCREEN_PIN
-                    )
+                    intent.putExtra(ARGS_NEXT_SCREEN, ARG_SCREEN_PIN)
                     setResult(Activity.RESULT_OK, intent)
                     finish()
                 }

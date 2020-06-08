@@ -70,6 +70,8 @@ dependencies {
     }
     implementation "io.gsonfire:gson-fire:$json_fire_version"
     implementation "joda-time:joda-time:$jodatime_version"
+
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
 }
 
 task generateApiTask(type: Exec) {
