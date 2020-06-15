@@ -4,25 +4,17 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.HorizontalScrollView
-import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.fragment_itn.buttonSave
 import kotlinx.android.synthetic.main.fragment_passport.*
-import kotlinx.android.synthetic.main.layout_doc_image.view.*
 import kotlinx.android.synthetic.main.static_hint_edittext.view.*
 import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyidsample.R
-import ru.breffi.storyidsample.ui.common.glide.GlideApp
-import ru.breffi.storyidsample.ui.common.model.ChangeState
-import ru.breffi.storyidsample.ui.passport.model.PassportPage
+import ru.breffi.storyidsample.ui.common.model.ChangeMonitor
 import ru.breffi.storyidsample.ui.common.ImageFragment
 import ru.breffi.storyidsample.ui.passport.adapter.PageAdapter
 import ru.breffi.storyidsample.ui.passport.mapper.PassportMapper
@@ -41,7 +33,7 @@ class PassportFragment : ImageFragment(), PageAdapter.Listener {
     private val viewModel: PassportViewModel by viewModels { viewModelFactory }
 
     private var profile: ProfileModel? = null
-    private val changeState = ChangeState()
+    private val changeMonitor = ChangeMonitor()
 
     private val pageAdapter = PageAdapter(this)
     private lateinit var passportMapper: PassportMapper
@@ -57,12 +49,12 @@ class PassportFragment : ImageFragment(), PageAdapter.Listener {
     }
 
     override fun onSelectImage(file: File) {
-        changeState.itemChanged(IMAGE_CHANGE_TAG, true)
+        changeMonitor.itemChanged(IMAGE_CHANGE_TAG, true)
         pageAdapter.setData(passportMapper.mapWithPageAdded(file))
     }
 
     override fun onDeleteImage(fileName: String) {
-        changeState.itemChanged(IMAGE_CHANGE_TAG, true)
+        changeMonitor.itemChanged(IMAGE_CHANGE_TAG, true)
         pageAdapter.setData(passportMapper.mapWithPageDeleted(fileName))
     }
 
@@ -80,7 +72,7 @@ class PassportFragment : ImageFragment(), PageAdapter.Listener {
         tvPassport.text.applyMask("____ ______")
         tvPassport.text.inputType = InputType.TYPE_CLASS_PHONE
 
-        changeState.setChangeListener { buttonSave.setButtonEnabled(it) }
+        changeMonitor.setChangeListener { buttonSave.setButtonEnabled(it) }
 
         buttonSave.setOnClickListener {
             profile = profile?.let {
@@ -89,7 +81,7 @@ class PassportFragment : ImageFragment(), PageAdapter.Listener {
             }
 
             viewModel.saveProfile(profile)
-            changeState.reset()
+            changeMonitor.reset()
             buttonSave.setButtonEnabled(false)
 
             activity?.setResult(Activity.RESULT_OK)
@@ -107,16 +99,6 @@ class PassportFragment : ImageFragment(), PageAdapter.Listener {
         }
     }
 
-    private fun updatePassportPages(pages: Map<Int, PassportPage>) {
-        profile = profile?.let {
-            val pageModels = pages.map { pageEntry ->
-                PassportPageModel(page = pageEntry.value.page, file = pageEntry.value.imageFile)
-            }
-            val passportModel = it.passport.copy(pages = pageModels)
-            it.copy(passport = passportModel)
-        }
-    }
-
     private fun handleProfilePassport(passport: PassportModel) {
         val passportData = passport.passportData
         val passportNumber = "${passportData.sn ?: ""} ${passportData.code ?: ""}".trim()
@@ -128,7 +110,7 @@ class PassportFragment : ImageFragment(), PageAdapter.Listener {
         pages_recycler_view.layoutManager = GridLayoutManager(context, 2)
 
         tvPassport.text.addTextChangedListener {
-            changeState.itemChanged("number", it.toString() != passportData.sn)
+            changeMonitor.itemChanged("number", it.toString() != passportData.sn)
         }
     }
 

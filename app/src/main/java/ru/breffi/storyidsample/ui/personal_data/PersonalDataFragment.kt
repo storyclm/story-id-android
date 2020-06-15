@@ -7,14 +7,13 @@ import android.view.View
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
 import kotlinx.android.synthetic.main.fragment_personal_data.*
 import kotlinx.android.synthetic.main.fragment_personal_data.buttonSave
 import kotlinx.android.synthetic.main.static_hint_edittext.view.*
 import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.common.BasePageInjectableFragment
-import ru.breffi.storyidsample.ui.common.model.ChangeState
+import ru.breffi.storyidsample.ui.common.model.ChangeMonitor
 import ru.breffi.storyidsample.utils.applyMask
 import ru.breffi.storyidsample.utils.orNull
 import ru.breffi.storyidsample.utils.setButtonEnabled
@@ -29,7 +28,7 @@ class PersonalDataFragment : BasePageInjectableFragment() {
     private val viewModel: PersonalDataViewModel by viewModels { viewModelFactory }
 
     private var profile: ProfileModel? = null
-    private val changeState = ChangeState()
+    private val changeMonitor = ChangeMonitor()
 
     companion object {
 
@@ -54,7 +53,7 @@ class PersonalDataFragment : BasePageInjectableFragment() {
         phone.text.isEnabled = false
         phone.text.isFocusable = false
 
-        changeState.setChangeListener { buttonSave.setButtonEnabled(it) }
+        changeMonitor.setChangeListener { buttonSave.setButtonEnabled(it) }
 
         email.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {
@@ -95,7 +94,7 @@ class PersonalDataFragment : BasePageInjectableFragment() {
             }
 
             viewModel.saveProfile(profile)
-            changeState.reset()
+            changeMonitor.reset()
             buttonSave.setButtonEnabled(false)
 
             activity?.setResult(Activity.RESULT_OK)
@@ -117,10 +116,10 @@ class PersonalDataFragment : BasePageInjectableFragment() {
         email.setText(profileId.email)
 
         phone.text.addTextChangedListener {
-            changeState.itemChanged("phone", it.toString() != profileId.phone)
+            changeMonitor.itemChanged("phone", it.toString() != profileId.phone)
         }
         email.text.addTextChangedListener {
-            changeState.itemChanged("email", it.toString() != profileId.email)
+            changeMonitor.itemChanged("email", it.toString() != profileId.email)
         }
 
         handleProfileDemographicsResource(profile.demographics)
@@ -132,13 +131,13 @@ class PersonalDataFragment : BasePageInjectableFragment() {
         patronymic.setText(profileDemographics.patronymic)
 
         name.text.addTextChangedListener {
-            changeState.itemChanged("name", it.toString() != profileDemographics.name)
+            changeMonitor.itemChanged("name", it.toString() != profileDemographics.name)
         }
         surname.text.addTextChangedListener {
-            changeState.itemChanged("surname", it.toString() != profileDemographics.surname)
+            changeMonitor.itemChanged("surname", it.toString() != profileDemographics.surname)
         }
         patronymic.text.addTextChangedListener {
-            changeState.itemChanged("patronymic", it.toString() != profileDemographics.patronymic)
+            changeMonitor.itemChanged("patronymic", it.toString() != profileDemographics.patronymic)
         }
     }
 }

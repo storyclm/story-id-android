@@ -1,18 +1,13 @@
 package ru.breffi.storyidsample.ui.passport
 
 import android.content.Context
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import ru.breffi.storyid.profile.model.PassportPageModel
 import ru.breffi.storyid.profile.model.ProfileModel
 import ru.breffi.storyidsample.repository.ProfileRepository
 import ru.breffi.storyidsample.repository.work.ProfileSyncWorker
 import ru.breffi.storyidsample.ui.common.LiveDataWrapper
-import ru.breffi.storyidsample.ui.passport.model.PassportPage
-import java.io.File
 import javax.inject.Inject
 
 
