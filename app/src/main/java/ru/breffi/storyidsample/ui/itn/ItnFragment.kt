@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.static_hint_edittext.view.*
 import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.common.glide.GlideApp
-import ru.breffi.storyidsample.ui.common.model.ChangeState
+import ru.breffi.storyidsample.ui.common.model.ChangeMonitor
 import ru.breffi.storyidsample.ui.common.ImageFragment
 import ru.breffi.storyidsample.utils.applyMask
 import ru.breffi.storyidsample.utils.orNull
@@ -33,7 +33,7 @@ class ItnFragment : ImageFragment() {
     private val viewModel: ItnViewModel by viewModels { viewModelFactory }
 
     private var profile: ProfileModel? = null
-    private val changeState = ChangeState()
+    private val changeMonitor = ChangeMonitor()
 
     companion object {
 
@@ -46,12 +46,12 @@ class ItnFragment : ImageFragment() {
     }
 
     override fun onSelectImage(file: File) {
-        changeState.itemChanged(ITN_TMP_FILE, true)
+        changeMonitor.itemChanged(ITN_TMP_FILE, true)
         viewModel.setItnImage(file)
     }
 
     override fun onDeleteImage(fileName: String) {
-        changeState.itemChanged(ITN_TMP_FILE, true)
+        changeMonitor.itemChanged(ITN_TMP_FILE, true)
         viewModel.deleteImage()
     }
 
@@ -73,7 +73,7 @@ class ItnFragment : ImageFragment() {
         tvItn.text.applyMask("____________")
         tvItn.text.inputType = InputType.TYPE_CLASS_PHONE
 
-        changeState.setChangeListener { buttonSave.setButtonEnabled(it) }
+        changeMonitor.setChangeListener { buttonSave.setButtonEnabled(it) }
 
         addItn.setOnClickListener {
             selectImage(ITN_TMP_FILE)
@@ -86,7 +86,7 @@ class ItnFragment : ImageFragment() {
             }
 
             viewModel.saveProfile(profile)
-            changeState.reset()
+            changeMonitor.reset()
             buttonSave.setButtonEnabled(false)
 
             activity?.setResult(Activity.RESULT_OK)
@@ -148,7 +148,7 @@ class ItnFragment : ImageFragment() {
         }
 
         tvItn.text.addTextChangedListener {
-            changeState.itemChanged("number", it.toString() != itn.itn)
+            changeMonitor.itemChanged("number", it.toString() != itn.itn)
         }
     }
 }

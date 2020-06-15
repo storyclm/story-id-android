@@ -1,6 +1,6 @@
 package ru.breffi.storyidsample.ui.common.model
 
-class ChangeState {
+class ChangeMonitor {
 
     private val items = mutableMapOf<String, Boolean>()
     private var listener: ((Boolean) -> Unit)? = null

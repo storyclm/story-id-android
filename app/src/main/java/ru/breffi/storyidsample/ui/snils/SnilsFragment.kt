@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.static_hint_edittext.view.*
 import ru.breffi.storyid.profile.model.*
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.common.glide.GlideApp
-import ru.breffi.storyidsample.ui.common.model.ChangeState
+import ru.breffi.storyidsample.ui.common.model.ChangeMonitor
 import ru.breffi.storyidsample.ui.common.ImageFragment
 import ru.breffi.storyidsample.utils.applyMask
 import ru.breffi.storyidsample.utils.orNull
@@ -34,7 +34,7 @@ class SnilsFragment : ImageFragment() {
     private val viewModel: SnilsViewModel by viewModels { viewModelFactory }
 
     private var profile: ProfileModel? = null
-    private val changeState = ChangeState()
+    private val changeMonitor = ChangeMonitor()
 
     companion object {
 
@@ -47,12 +47,12 @@ class SnilsFragment : ImageFragment() {
     }
 
     override fun onSelectImage(file: File) {
-        changeState.itemChanged(SNILS_TMP_FILE, true)
+        changeMonitor.itemChanged(SNILS_TMP_FILE, true)
         viewModel.setSnilsImage(file)
     }
 
     override fun onDeleteImage(fileName: String) {
-        changeState.itemChanged(SNILS_TMP_FILE, true)
+        changeMonitor.itemChanged(SNILS_TMP_FILE, true)
         viewModel.deleteImage()
     }
 
@@ -70,7 +70,7 @@ class SnilsFragment : ImageFragment() {
         tvSnils.text.applyMask("___-___-___-__")
         tvSnils.text.inputType = InputType.TYPE_CLASS_PHONE
 
-        changeState.setChangeListener { buttonSave.setButtonEnabled(it) }
+        changeMonitor.setChangeListener { buttonSave.setButtonEnabled(it) }
 
         addSnils.setOnClickListener {
             selectImage(SNILS_TMP_FILE)
@@ -83,7 +83,7 @@ class SnilsFragment : ImageFragment() {
             }
 
             viewModel.saveProfile(profile)
-            changeState.reset()
+            changeMonitor.reset()
             buttonSave.setButtonEnabled(false)
 
             activity?.setResult(Activity.RESULT_OK)
@@ -146,7 +146,7 @@ class SnilsFragment : ImageFragment() {
         }
 
         tvSnils.text.addTextChangedListener {
-            changeState.itemChanged("number", it.toString() != snils.snils)
+            changeMonitor.itemChanged("number", it.toString() != snils.snils)
         }
     }
 }
