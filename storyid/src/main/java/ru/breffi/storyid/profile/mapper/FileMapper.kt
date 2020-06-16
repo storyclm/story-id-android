@@ -17,15 +17,18 @@ internal class FileMapper(private val fileHelper: FileHelper, private val metada
         fileHelper.copy(createModel.file, fileName)
         val mimeType = FileHelper.getMimeType(createModel.file)
         return dbModel?.copy(
+            category = path.category,
+            name = path.name,
+            fileName = fileName,
             modifiedAt = metadata.timestamp,
             mimeType = mimeType
         ) ?: FileDbModel(
             internalId = newId(),
             category = path.category,
             name = path.name,
+            fileName = fileName,
             createdAt = metadata.timestamp,
             modifiedAt = metadata.timestamp,
-            fileName = fileName,
             userId = metadata.userId,
             mimeType = mimeType
         )
