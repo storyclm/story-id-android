@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit
 internal object ClientFactory {
 
     private const val LOGGER_TAG = "HTTPLogger"
+    private const val TIMEOUT_SECONDS = 5L
 
     fun createDefaultClient(tokenHandler: TokenHandler): OkHttpClient {
         val logger = HttpLoggingInterceptor.Logger { message ->
@@ -21,9 +22,9 @@ internal object ClientFactory {
             .setLevel(HttpLoggingInterceptor.Level.BODY)
         val authInterceptor = AuthInterceptor(tokenHandler)
         return OkHttpClient.Builder()
-            .connectTimeout(15, TimeUnit.SECONDS)
-            .readTimeout(15, TimeUnit.SECONDS)
-            .writeTimeout(15, TimeUnit.SECONDS)
+            .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .addInterceptor(authInterceptor)
             .authenticator(authInterceptor)
             .addInterceptor(RetryInterceptor())
