@@ -5,7 +5,7 @@ import okhttp3.Response
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-class RetryInterceptor(private val retryCount: Int = 3) : Interceptor {
+class RetryInterceptor(private val retryCount: Int = 3, private val retryDelayMillis: Long = 1000) : Interceptor {
 
     private val retryCodes = (500..599) + 402 + (405..499)
 
@@ -15,6 +15,9 @@ class RetryInterceptor(private val retryCount: Int = 3) : Interceptor {
         var response: Response?
         var retry = 0
         do {
+            if (retry > 0) {
+                Thread.sleep(retryDelayMillis)
+            }
             try {
                 response = chain.proceed(request)
             } catch (e: SocketTimeoutException) {
