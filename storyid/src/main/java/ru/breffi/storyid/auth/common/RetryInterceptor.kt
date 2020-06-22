@@ -2,12 +2,11 @@ package ru.breffi.storyid.auth.common
 
 import okhttp3.Interceptor
 import okhttp3.Response
+import ru.breffi.storyid.auth.common.model.RetryPolicy
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-class RetryInterceptor(private val retryCount: Int = 3, private val retryDelayMillis: Long = 1000) : Interceptor {
-
-    private val retryCodes = (500..599) + 402 + (405..499)
+class RetryInterceptor(private val retryPolicy: RetryPolicy = RetryPolicy()) : Interceptor {
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -16,7 +15,7 @@ class RetryInterceptor(private val retryCount: Int = 3, private val retryDelayMi
         var retry = 0
         do {
             if (retry > 0) {
-                Thread.sleep(retryDelayMillis)
+                Thread.sleep(retryPolicy.delayMillis)
             }
             try {
                 response = chain.proceed(request)
@@ -24,7 +23,7 @@ class RetryInterceptor(private val retryCount: Int = 3, private val retryDelayMi
                 response = null
                 e.printStackTrace()
             }
-        } while ((response == null || !response.isSuccessful && response.code() in retryCodes) && retry++ < retryCount)
+        } while ((response == null || !response.isSuccessful && response.code() in retryPolicy.codes) && retry++ < retryPolicy.count)
         return response ?: throw SocketTimeoutException()
     }
 }
