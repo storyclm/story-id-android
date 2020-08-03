@@ -80,7 +80,7 @@ class ProfileHandler internal constructor(
                 val mapper = ProfileModelMapper(metadata, fileHelper)
                 val savedProfile = getProfile()
 
-                val updatedProfileDbModel = if (savedProfile?.profileId == profile.profileId) {
+                val updatedProfileDbModel = if (savedProfile?.profileId != profile.profileId) {
                     mapper.getUpdatedProfileDbModel(profile.profileId, profileDataDao.getUserProfile(userId))
                 } else null
                 val updatedDemographicsDbModel = if (savedProfile?.demographics != profile.demographics) {
