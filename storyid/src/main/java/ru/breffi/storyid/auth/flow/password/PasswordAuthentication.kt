@@ -3,13 +3,13 @@ package ru.breffi.storyid.auth.flow.password
 import okhttp3.FormBody
 import ru.breffi.storyid.auth.common.Authentication
 import ru.breffi.storyid.auth.common.model.AuthConfig
-import ru.breffi.storyid.auth.common.model.AuthState
+import ru.breffi.storyid.auth.common.model.IdResult
 import ru.breffi.storyid.auth.common.repository.AuthRepository
 
 internal class PasswordAuthentication(authConfig: AuthConfig, authRepository: AuthRepository) : Authentication(authConfig, authRepository),
     PasswordAuthHandler {
 
-    override fun passwordAuth(username: String, password: String): AuthState {
+    override fun passwordAuth(username: String, password: String): IdResult {
         val authForm = FormBody.Builder()
             .add(KEY_GRANT_TYPE, "password")
             .add(KEY_USERNAME, username)

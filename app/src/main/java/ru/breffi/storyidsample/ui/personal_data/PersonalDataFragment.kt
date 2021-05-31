@@ -50,8 +50,8 @@ class PersonalDataFragment : BasePageInjectableFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         phone.text.applyMask("+7 (___) ___-__-__")
-        phone.text.isEnabled = false
-        phone.text.isFocusable = false
+//        phone.text.isEnabled = false
+//        phone.text.isFocusable = false
 
         changeMonitor.setChangeListener { buttonSave.setButtonEnabled(it) }
 
@@ -86,7 +86,7 @@ class PersonalDataFragment : BasePageInjectableFragment() {
             val mail = email.getText().trim()
             if (mail.validateEmail()) {
                 profile = profile?.let {
-                    val profileId = it.profileId.copy(email = mail.orNull(), emailVerified = false)
+                    val profileId = it.profileId.copy(email = mail.orNull(), emailVerified = false, phone = phone.getText().getDigits())
                     it.copy(profileId = profileId)
                 }
 
@@ -139,6 +139,20 @@ class PersonalDataFragment : BasePageInjectableFragment() {
         patronymic.text.addTextChangedListener {
             changeMonitor.itemChanged("patronymic", it.toString() != profileDemographics.patronymic)
         }
+    }
+
+    fun String.getDigits(): String {
+        var s = this
+        return if (s.length > 1) {
+            s = s.replace("+7", "7")
+            s.getOnlyNumeric()
+        } else {
+            s.replace("+", "")
+        }
+    }
+
+    private fun String.getOnlyNumeric(): String {
+        return replace("[^\\d]".toRegex(), "")
     }
 }
 

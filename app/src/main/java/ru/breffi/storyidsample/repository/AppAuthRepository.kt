@@ -1,10 +1,9 @@
 package ru.breffi.storyidsample.repository
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ru.breffi.storyid.auth.common.model.AuthError
-import ru.breffi.storyid.auth.common.model.AuthState
-import ru.breffi.storyid.auth.common.model.AuthSuccess
+import ru.breffi.storyid.auth.common.model.IdResult
 import ru.breffi.storyid.auth.flow.passwordless.PasswordlessAuthHandler
 import ru.breffi.storyid.profile.ProfileInteractor
 import ru.breffi.storyidsample.utils.getDigits
@@ -20,19 +19,15 @@ internal constructor(
     private val profileInteractor: ProfileInteractor
 ) {
 
-    suspend fun login(phone: String): AuthState {
+    suspend fun login(phone: String): IdResult {
         return withContext(Dispatchers.IO) {
             authHandler.passwordlessAuth(phone.getDigits())
         }
     }
 
-    suspend fun confirmCode(code: String): AuthState {
-        val authState = withContext(Dispatchers.IO) {
+    suspend fun confirmCode(code: String): IdResult {
+        return withContext(Dispatchers.IO) {
             authHandler.passwordlessProceedWithCode(code)
-        }
-        return when (authState) {
-            AuthSuccess -> authState
-            is AuthError -> authState
         }
     }
 

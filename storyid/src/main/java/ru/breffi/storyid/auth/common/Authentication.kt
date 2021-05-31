@@ -1,13 +1,13 @@
 package ru.breffi.storyid.auth.common
 
 import com.google.gson.Gson
-import okhttp3.FormBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONObject
 import ru.breffi.storyid.auth.common.mapper.AuthDataMapper
 import ru.breffi.storyid.auth.common.model.*
 import ru.breffi.storyid.auth.common.repository.AuthRepository
+import ru.breffi.storyid.auth.flow.passwordless.PasswordlessAuthentication
 import java.io.IOException
 
 internal open class Authentication(protected val authConfig: AuthConfig, protected val authRepository: AuthRepository)
@@ -37,14 +37,47 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
         return authRepository.getAuthData() != null
     }
 
+    override fun userExists(username: String): IdValueResult<Boolean> {
+        return try {
+            val configResult = getConfiguration()
+
+            if (configResult.value == null) return IdValueResult.ofFailure(configResult.exception)
+
+            val httpUrl = HttpUrl.parse(configResult.value.issuer)
+                ?.newBuilder("/verify/exists")
+                ?.build()
+            if (httpUrl == null) return IdValueResult.ofFailure(IdException(code = 0, message = "invalid issuer"))
+
+            val jsonObject = JSONObject()
+            jsonObject.put(PasswordlessAuthentication.KEY_LOGIN, username)
+            jsonObject.put(PasswordlessAuthentication.KEY_NOPASS_CLIENT, authConfig.clientId)
+            jsonObject.put(PasswordlessAuthentication.KEY_NOPASS_SECRET, authConfig.clientSecret)
+            val existsBody = RequestBody
+                .create(MediaType.parse("application/json; charset=utf-8"), jsonObject.toString())
+            val request = Request.Builder()
+                .url(httpUrl)
+                .put(existsBody)
+                .build()
+            val response = internalClient.newCall(request).execute()
+            when {
+                response.isSuccessful -> IdValueResult.ofSuccess(true)
+                response.code() == 404 -> IdValueResult.ofSuccess(false)
+                else -> IdValueResult.ofFailure(IdException(code = response.code(), message = response.message(), bodyString = response.body()?.string()))
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            IdValueResult.ofFailure(e)
+        }
+    }
+
     override fun logout() {
         authRepository.clearAuthData()
     }
 
-    protected fun performAuthRequest(authForm: FormBody): AuthState {
+    protected fun performAuthRequest(authForm: FormBody): IdResult {
         try {
             val configResult = getConfiguration()
-            configResult.openIDConfiguration?.let { openIDConfiguration ->
+            return configResult.onSuccess { openIDConfiguration ->
                 val request = Request.Builder()
                     .url(openIDConfiguration.tokenEndpoint)
                     .post(authForm)
@@ -55,26 +88,23 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
                         gson.fromJson(body.string(), AuthResponse::class.java)?.let { authResponse ->
                             val authData = AuthDataMapper.map(authResponse)
                             authRepository.saveAuthData(authData)
-                            return AuthSuccess
+                            IdValueResult.ofSuccess()
                         }
-                    }
-                    return AuthError(code = response.code(), message = "null body")
+                    } ?: IdResult.ofFailure(IdException(code = response.code(), message = "null or empty body"))
                 } else {
                     authRepository.clearAuthData()
-                    return AuthError(code = response.code(), message = response.message(), bodyString = response.body()?.string())
+                    IdResult.ofFailure(IdException(code = response.code(), message = response.message(), bodyString = response.body()?.string()))
                 }
-            } ?: configResult.authState
+            } ?: IdResult.ofFailure(configResult.exception)
         } catch (e: IOException) {
             e.printStackTrace()
-            return AuthError(e)
+            return IdResult.ofFailure(e)
         }
-        return AuthError()
     }
 
     override fun refreshAccessToken() {
         authRepository.getAuthData()?.refreshToken?.let { refreshToken ->
-            val configResult = getConfiguration()
-            configResult.openIDConfiguration?.let { openIDConfiguration ->
+            getConfiguration().onSuccess { openIDConfiguration ->
                 val formBody = FormBody.Builder()
                     .addEncoded(KEY_GRANT_TYPE, "refresh_token")
                     .addEncoded(KEY_REFRESH_TOKEN, refreshToken)
@@ -109,7 +139,7 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
     }
 
     @Throws(IOException::class)
-    protected fun getConfiguration(): OpenIDConfigResult {
+    protected fun getConfiguration(): IdValueResult<OpenIDConfiguration> {
         val request = Request.Builder()
             .url(authConfig.openIdConfigUrl)
             .get()
@@ -118,10 +148,10 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
         return if (response.isSuccessful) {
             response.body()?.let { body ->
                 val config = gson.fromJson(body.string(), OpenIDConfiguration::class.java)
-                OpenIDConfigResult(AuthSuccess, config)
-            } ?: OpenIDConfigResult(AuthError(code = response.code(), message = "null config body"))
+                IdValueResult.ofSuccess(config)
+            } ?: IdValueResult.ofFailure(IdException(code = response.code(), message = "null config body"))
         } else {
-            OpenIDConfigResult(AuthError(code = response.code(), message = response.message(), bodyString = response.body()?.string()))
+            IdValueResult.ofFailure(IdException(code = response.code(), message = response.message(), bodyString = response.body()?.string()))
         }
     }
 }

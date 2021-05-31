@@ -10,7 +10,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import ru.breffi.storyidsample.api.base.ApiError
 import retrofit2.HttpException
-import ru.breffi.storyid.auth.common.model.AuthException
+import ru.breffi.storyid.auth.common.model.IdException
 import ru.breffi.storyidsample.R
 import java.io.IOException
 import java.net.SocketTimeoutException
@@ -54,7 +54,7 @@ fun Throwable.getMessage(context: Context): String {
         message = context.getString(R.string.error_network)
     } else if (this is IOException) {
         message = context.getString(R.string.error_network)
-    } else if (this is HttpException || this is AuthException) {
+    } else if (this is HttpException || this is IdException) {
         val apiError = this.getApiError()
 
         message = if (apiError?.errorDescription != null) {
@@ -75,7 +75,7 @@ fun Throwable.getMessage(context: Context): String {
 
 fun Throwable.getApiError(): ApiError? {
     val bodyString = (this as? HttpException)?.response()?.errorBody()?.string()
-        ?: (this as? AuthException)?.bodyString
+        ?: (this as? IdException)?.bodyString
 
     return bodyString?.let {
         try {
@@ -88,7 +88,7 @@ fun Throwable.getApiError(): ApiError? {
 
 fun Throwable.getApiErrorCode(): Int {
     return (this as? HttpException)?.code()
-        ?: (this as? AuthException)?.code
+        ?: (this as? IdException)?.code
         ?: 0
 }
 

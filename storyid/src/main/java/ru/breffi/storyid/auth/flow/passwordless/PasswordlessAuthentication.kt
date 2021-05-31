@@ -3,10 +3,7 @@ package ru.breffi.storyid.auth.flow.passwordless
 import okhttp3.*
 import org.json.JSONObject
 import ru.breffi.storyid.auth.common.Authentication
-import ru.breffi.storyid.auth.common.model.AuthConfig
-import ru.breffi.storyid.auth.common.model.AuthError
-import ru.breffi.storyid.auth.common.model.AuthState
-import ru.breffi.storyid.auth.common.model.AuthSuccess
+import ru.breffi.storyid.auth.common.model.*
 import ru.breffi.storyid.auth.common.repository.AuthRepository
 import ru.breffi.storyid.auth.flow.passwordless.model.PasswordlessResponse
 import java.io.IOException
@@ -23,17 +20,16 @@ internal class PasswordlessAuthentication(authConfig: AuthConfig, authRepository
 
     private val formValues = mutableMapOf<String, String>()
 
-    override fun passwordlessAuth(username: String): AuthState {
-        try {
+    override fun passwordlessAuth(username: String): IdResult {
+        return try {
             val configResult = getConfiguration()
 
-            val openIDConfiguration = configResult.openIDConfiguration
-            if (openIDConfiguration == null) return configResult.authState
+            if (configResult.value == null) return IdResult.ofFailure(configResult.exception)
 
-            val httpUrl = HttpUrl.parse(openIDConfiguration.issuer)
+            val httpUrl = HttpUrl.parse(configResult.value.issuer)
                     ?.newBuilder("/verify/code")
                     ?.build()
-            if (httpUrl == null) return AuthError(code = 0, message = "invalid issuer")
+            if (httpUrl == null) return IdResult.ofFailure(IdException(code = 0, message = "invalid issuer"))
 
             val jsonObject = JSONObject()
             jsonObject.put(KEY_LOGIN, username)
@@ -46,7 +42,7 @@ internal class PasswordlessAuthentication(authConfig: AuthConfig, authRepository
                 .post(passwordlessBody)
                 .build()
             val response = internalClient.newCall(request).execute()
-            if (response.isSuccessful) {
+            return if (response.isSuccessful) {
                 response.body()?.let { body ->
                     gson.fromJson(body.string(), PasswordlessResponse::class.java)?.let { response ->
                         formValues.clear()
@@ -56,21 +52,19 @@ internal class PasswordlessAuthentication(authConfig: AuthConfig, authRepository
                         formValues[KEY_SIGNATURE] = response.signature
                         formValues[KEY_CLIENT_ID] = authConfig.clientId
                         formValues[KEY_CLIENT_SECRET] = authConfig.clientSecret
-                        return AuthSuccess
+                        IdResult.ofSuccess()
                     }
-                    return AuthError(code = response.code(), message = "null body")
-                }
+                } ?: IdResult.ofFailure(IdException(code = response.code(), message = "null body"))
             } else {
-                return AuthError(code = response.code(), message = response.message(), bodyString = response.body()?.string())
+                IdResult.ofFailure(IdException(code = response.code(), message = response.message(), bodyString = response.body()?.string()))
             }
         } catch (e: IOException) {
             e.printStackTrace()
-            return AuthError(e)
+            IdResult.ofFailure(e)
         }
-        return AuthError()
     }
 
-    override fun passwordlessProceedWithCode(code: String): AuthState {
+    override fun passwordlessProceedWithCode(code: String): IdResult {
         val authForm = FormBody.Builder()
             .apply { formValues.forEach { add(it.key, it.value) } }
             .add(KEY_CODE, code)
