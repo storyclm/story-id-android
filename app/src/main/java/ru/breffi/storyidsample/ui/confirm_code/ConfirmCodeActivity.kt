@@ -20,7 +20,7 @@ import ru.breffi.storyidsample.repository.work.ProfileSyncWorker
 import ru.breffi.storyidsample.ui.common.BaseInjectableActivity
 import kotlinx.android.synthetic.main.activity_confirm_code.*
 import kotlinx.android.synthetic.main.include_app_bar.*
-import ru.breffi.storyid.auth.common.model.AuthState
+import ru.breffi.storyid.auth.common.model.IdResult
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.repository.work.BankAccountsSyncWorker
 import ru.breffi.storyidsample.repository.work.FilesSyncWorker
@@ -161,7 +161,7 @@ class ConfirmCodeActivity : BaseInjectableActivity() {
         timer?.cancel()
     }
 
-    private fun handleConfirmResource(resource: Resource<AuthState>) {
+    private fun handleConfirmResource(resource: Resource<IdResult>) {
         when {
             resource.isSucceed -> {
                 if (resource.data != null) {
@@ -211,7 +211,7 @@ class ConfirmCodeActivity : BaseInjectableActivity() {
         }
     }
 
-    private fun handleResendResource(resource: Resource<AuthState>) {
+    private fun handleResendResource(resource: Resource<IdResult>) {
         if (resource.isSucceed) {
 
             if (resource.data != null) {

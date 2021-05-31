@@ -7,13 +7,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import kotlinx.android.synthetic.main.activity_auth.*
 import kotlinx.android.synthetic.main.include_app_bar.*
-import ru.breffi.storyid.auth.common.model.AuthState
+import ru.breffi.storyid.auth.common.model.IdResult
 import ru.breffi.storyidsample.ui.common.BaseInjectableActivity
 import ru.breffi.storyidsample.R
 import ru.breffi.storyidsample.ui.common.PositiveOrDismissDialog
@@ -75,7 +74,7 @@ class AuthActivity : BaseInjectableActivity() {
         viewModel.response.observe(this) { handleAuthState(it) }
     }
 
-    private fun handleAuthState(resource: Resource<AuthState>) {
+    private fun handleAuthState(resource: Resource<IdResult>) {
         if (resource.isSucceed) {
             showProgress(false)
             if (resource.data != null) {
