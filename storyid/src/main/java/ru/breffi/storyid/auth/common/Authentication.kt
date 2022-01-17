@@ -1,5 +1,7 @@
 package ru.breffi.storyid.auth.common
 
+import android.os.Handler
+import android.os.Looper
 import com.google.gson.Gson
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
@@ -27,7 +29,11 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
     protected val gson = Gson()
     protected val internalClient = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+        .addInterceptor(RetryInterceptor())
         .build()
+
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var authLostListener: AuthHandler.AuthLostListener? = null
 
     override fun getAuthData(): AuthData? {
         return authRepository.getAuthData()
@@ -68,6 +74,10 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
             e.printStackTrace()
             IdValueResult.ofFailure(e)
         }
+    }
+
+    override fun setAuthLostListener(listener: AuthHandler.AuthLostListener?) {
+        authLostListener = listener
     }
 
     override fun logout() {
@@ -125,6 +135,9 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
                     }
                 } else {
                     authRepository.clearAuthData()
+                    mainHandler.post {
+                        authLostListener?.onAuthLost()
+                    }
                 }
             }
         }
