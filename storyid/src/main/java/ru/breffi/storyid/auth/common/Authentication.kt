@@ -136,7 +136,8 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
                 } else {
                     authRepository.clearAuthData()
                     mainHandler.post {
-                        authLostListener?.onAuthLost()
+                        val cause = IdException(code = response.code(), message = response.message(), bodyString = response.body()?.string())
+                        authLostListener?.onAuthLost(cause)
                     }
                 }
             }
