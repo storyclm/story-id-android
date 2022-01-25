@@ -134,10 +134,28 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
                         }
                     }
                 } else {
+                    val authData = authRepository.getAuthData()
                     authRepository.clearAuthData()
                     mainHandler.post {
-                        val cause = IdException(code = response.code(), message = response.message(), bodyString = response.body()?.string())
-                        authLostListener?.onAuthLost(cause)
+                        val originalRequest = response.request()
+                        val requestForm = (originalRequest.body() as? FormBody)?.let { body ->
+                            (0 until body.size())
+                                .map { index ->
+                                    body.encodedName(index) to body.encodedValue(index)
+                                }
+                                .toMap()
+                        }
+                        val idRequestDetails = IdRequestDetails(
+                            authData = authData,
+                            requestUrl = originalRequest.url().toString(),
+                            requestHeaders = originalRequest.headers(),
+                            requestForm = requestForm,
+                            responseCode = response.code(),
+                            responseHeaders = response.headers(),
+                            responseMessage = response.message(),
+                            responseBody = response.body()?.string()
+                        )
+                        authLostListener?.onAuthLost(idRequestDetails)
                     }
                 }
             }
