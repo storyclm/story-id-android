@@ -1,8 +1,6 @@
 package ru.breffi.storyid.auth.common.model
 
 import okhttp3.Headers
-import okhttp3.Request
-import okhttp3.Response
 
 data class IdRequestDetails(
     val authData: AuthData?,
@@ -11,6 +9,6 @@ data class IdRequestDetails(
     val requestForm: Map<String, String>?,
     val responseCode: Int,
     val responseHeaders: Headers,
-    val responseMessage: String,
+    val responseMessage: String?,
     val responseBody: String?
 )
