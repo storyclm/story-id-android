@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import ru.breffi.storyid.auth.common.model.AuthData
 
 
@@ -37,7 +38,12 @@ internal class AuthEncryptedStorage(context: Context, authStorageName: String) {
 
     fun getAuthData(): AuthData? {
         return prefs.getString(KEY_AUTH_DATA, null)?.let { dataString ->
-            gson.fromJson(dataString, AuthData::class.java)
+            try {
+                gson.fromJson(dataString, AuthData::class.java)
+            } catch (e: JsonSyntaxException) {
+                e.printStackTrace()
+                null
+            }
         }
     }
 
