@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
+import ru.breffi.storyid.auth.common.ClientFactory.trustAll
 import ru.breffi.storyid.auth.common.mapper.AuthDataMapper
 import ru.breffi.storyid.auth.common.model.*
 import ru.breffi.storyid.auth.common.repository.AuthRepository
@@ -30,6 +31,7 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
     protected val internalClient = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
         .addInterceptor(RetryInterceptor())
+        .trustAll(authConfig.trustAll)
         .build()
 
     private val mainHandler = Handler(Looper.getMainLooper())
