@@ -10,7 +10,7 @@ import ru.breffi.storyid.auth.common.storage.AuthEncryptedStorage
 class ServiceAuthProvider(context: Context, authConfig: AuthConfig) {
 
     private val authentication = ServiceAuthentication(authConfig, AuthRepository(AuthEncryptedStorage(context, authConfig.authStorageName)))
-    private val client = ClientFactory.createDefaultClient(authentication)
+    private val client = ClientFactory.createDefaultClient(authentication, authConfig.trustAll)
 
     fun getFlowHandler(): ServiceAuthHandler {
         return authentication

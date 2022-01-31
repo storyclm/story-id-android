@@ -1,5 +1,6 @@
 package ru.breffi.storyid.auth.flow.passwordless
 
+import com.google.gson.JsonSyntaxException
 import okhttp3.*
 import org.json.JSONObject
 import ru.breffi.storyid.auth.common.Authentication
@@ -59,6 +60,9 @@ internal class PasswordlessAuthentication(authConfig: AuthConfig, authRepository
                 IdResult.ofFailure(IdException(code = response.code(), message = response.message(), bodyString = response.body()?.string()))
             }
         } catch (e: IOException) {
+            e.printStackTrace()
+            IdResult.ofFailure(e)
+        } catch (e: JsonSyntaxException) {
             e.printStackTrace()
             IdResult.ofFailure(e)
         }

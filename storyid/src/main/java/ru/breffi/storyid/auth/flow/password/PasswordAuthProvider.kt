@@ -10,7 +10,7 @@ import ru.breffi.storyid.auth.common.storage.AuthEncryptedStorage
 class PasswordAuthProvider(context: Context, authConfig: AuthConfig) {
 
     private val authentication = PasswordAuthentication(authConfig, AuthRepository(AuthEncryptedStorage(context, authConfig.authStorageName)))
-    private val client = ClientFactory.createDefaultClient(authentication)
+    private val client = ClientFactory.createDefaultClient(authentication, authConfig.trustAll)
 
     fun getFlowHandler(): PasswordAuthHandler {
         return authentication

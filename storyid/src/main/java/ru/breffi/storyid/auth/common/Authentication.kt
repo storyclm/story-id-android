@@ -3,9 +3,11 @@ package ru.breffi.storyid.auth.common
 import android.os.Handler
 import android.os.Looper
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
+import ru.breffi.storyid.auth.common.ClientFactory.trustAll
 import ru.breffi.storyid.auth.common.mapper.AuthDataMapper
 import ru.breffi.storyid.auth.common.model.*
 import ru.breffi.storyid.auth.common.repository.AuthRepository
@@ -30,6 +32,7 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
     protected val internalClient = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
         .addInterceptor(RetryInterceptor())
+        .trustAll(authConfig.trustAll)
         .build()
 
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -109,6 +112,9 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
         } catch (e: IOException) {
             e.printStackTrace()
             return IdResult.ofFailure(e)
+        } catch (e: JsonSyntaxException) {
+            e.printStackTrace()
+            return IdResult.ofFailure(e)
         }
     }
 
@@ -128,9 +134,13 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
                 val response = internalClient.newCall(request).execute()
                 if (response.isSuccessful) {
                     response.body()?.let { body ->
-                        gson.fromJson(body.string(), AuthResponse::class.java)?.let { authResponse ->
-                            val authData = AuthDataMapper.map(authResponse)
-                            authRepository.saveAuthData(authData)
+                        try {
+                            gson.fromJson(body.string(), AuthResponse::class.java)?.let { authResponse ->
+                                val authData = AuthDataMapper.map(authResponse)
+                                authRepository.saveAuthData(authData)
+                            }
+                        } catch (e: JsonSyntaxException) {
+                            e.printStackTrace()
                         }
                     }
                 } else {
@@ -179,8 +189,13 @@ internal open class Authentication(protected val authConfig: AuthConfig, protect
         val response = internalClient.newCall(request).execute()
         return if (response.isSuccessful) {
             response.body()?.let { body ->
-                val config = gson.fromJson(body.string(), OpenIDConfiguration::class.java)
-                IdValueResult.ofSuccess(config)
+                try {
+                    val config = gson.fromJson(body.string(), OpenIDConfiguration::class.java)
+                    IdValueResult.ofSuccess(config)
+                } catch (e: JsonSyntaxException) {
+                    e.printStackTrace()
+                    IdValueResult.ofFailure<OpenIDConfiguration>(e)
+                }
             } ?: IdValueResult.ofFailure(IdException(code = response.code(), message = "null config body"))
         } else {
             IdValueResult.ofFailure(IdException(code = response.code(), message = response.message(), bodyString = response.body()?.string()))
