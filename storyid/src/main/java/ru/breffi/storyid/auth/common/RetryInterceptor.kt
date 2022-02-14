@@ -11,13 +11,14 @@ class RetryInterceptor(private val retryPolicy: RetryPolicy = RetryPolicy()) : I
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        var response: Response?
+        var response: Response? = null
         var retry = 0
         do {
             if (retry > 0) {
                 Thread.sleep(retryPolicy.delayMillis)
             }
             try {
+                response?.close()
                 response = chain.proceed(request)
             } catch (e: SocketTimeoutException) {
                 response = null
