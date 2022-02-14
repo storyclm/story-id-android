@@ -157,6 +157,7 @@ class ConfirmCodeActivity : BaseInjectableActivity() {
     }
 
     override fun onDestroy() {
+        unregisterReceiver(smsVerificationReceiver)
         super.onDestroy()
         timer?.cancel()
     }
